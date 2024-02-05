@@ -1,11 +1,32 @@
 <template>
     <div class="wrapper">
-        <div v-if="overallContent" class="page-header text-center">
-            <h1>{{ overallContent[0]['chapterTitle'] }}</h1>
-            <h2 class="text-secondary">{{ overallContent[0]['chapterSubtitle'] }}</h2>
+        <div v-if="getChapterInfo" class="page-header text-center">
+            <h1>{{ getChapterInfo['chapterTitle'] }}</h1>
+            <h2 class="text-secondary">{{ getChapterInfo['chapterSubtitle'] }}</h2>
         </div>
-        <div class="questions-grid col-11 col-sm-11 col-md-11 col-md-9 col-lg-7">
-            <div v-if="questionsList != null && questionsList.length != 0" class="qiestion-item overflow-auto">
+
+        <div v-if="!questionsList" class="m-auto py-5" style="width: max-content;">
+            <div>
+                <h3>Fetching Data</h3>
+            </div>
+            <div class="d-flex gap-1">
+                <span v-for="dot in dots" class="p-1 bg-primary">
+                    {{ dot }}
+                </span>
+            </div>
+        </div>
+        <div v-else-if="questionsList.length == 0" class="py-5">
+            {{ stopDotsInterval() }}
+            <div class="d-flex flex-column align-items-center">
+                <i class="bi bi-database-fill-x" style="font-size: 3rem;"></i>
+                <span class="fs-6">NO DATA</span>
+            </div>
+        </div>
+        <div v-else class="questions-grid col-11 col-sm-11 col-md-11 col-md-9 col-lg-7">
+            {{ stopDotsInterval() }}
+            {{ recordStartDate() }}
+            <!-- v-if="questionsList != null && questionsList.length != 0" -->
+            <div class="qiestion-item overflow-auto">
                 <div class="question-title d-flex mb-3 p-2">
                     <span class="q-no">{{ `(${currentIndex + 1})` }}</span>
                     <span class="q-text">{{ questionsList[currentIndex]['questionTitle'] }}</span>
@@ -64,21 +85,34 @@
 </template>
 
 <script>
+var dotsInterval;
+var isIncrease = true;
 export default {
     props: ['specific', 'chapter'],
     data() {
         return {
-            'overallContent': null,
             'questionName': this.specific,
             'chapterId': this.chapter,
             'questionsList': null,
             'currentIndex': 0,
             'selectedItems': [],
             'isSubmit': false,
-            'isChanges': false
+            'isChanges': false,
+
+            // Data Fetching...
+            dots: [""],
+
+            chapterInfo: null,
+            startDateTime: null
         }
     },
     methods: {
+        recordStartDate() {
+            this.startDateTime = Date.now()
+        },
+        stopDotsInterval() {
+            clearInterval(dotsInterval)
+        },
         userTakeAction() {
             this.isChanges = true;
         },
@@ -143,6 +177,8 @@ export default {
                         'totalCorrectCount': totalTrueCount,
                         'totalQuestionsCount': this.questionsList.length,
                         'chapterCodeId': this.chapter,
+                        'subject': this.chapterInfo?.[0]?.subject,
+                        'startDateTime': this.startDateTime
                     },
                     collectionName: 'user_answers',
                     requireUserInfo: true,
@@ -171,19 +207,29 @@ export default {
 
                 return;
             }
-            // else {
-            //     // { name: to.name, replace: true }
-            //     next()
-            // }
         }
-        // else {
         next()
-        // }
+    },
+    computed: {
+        getChapterInfo() {
+            this.chapterInfo = this.$store.getters.acquireOneChapterData({ 'questionName': this.questionName, 'chapterId': this.chapterId })
+            if (!this.chapterInfo) {
+                setTimeout(() => {
+                    this.$store.dispatch('getCollectionData', {
+                        firstAccessCode: this.questionName,
+                        method: 'get',
+                        collectionKey: 'chapter',
+                    })
+                }, 1500);
+            }
+            // console.log(this.chapterInfo);
+            return this.chapterInfo?.[0] ?? null
+        }
     },
     mounted() {
 
-        console.log(this.specific);
-        console.log(this.chapter);
+        // console.log(this.specific);
+        // console.log(this.chapter);
 
         this.$store.watch(
             (_, getters) => getters.acquireQuestionsData(this.questionName),
@@ -192,7 +238,6 @@ export default {
                 if (this.questionsList != null && this.questionsList.length > 0) {
                     this.questionsList[0]['userAnswerKeys'] = []
                 }
-                // this.currentIndex = newValue.length - 1
             }
         )
 
@@ -207,7 +252,20 @@ export default {
                 }],
             })
         }, 1500);
-        this.overallContent = this.$store.getters.acquireOneChapterData({ 'questionName': this.questionName, 'chapterId': this.chapterId })
+
+        // Loading
+        if (!this.data)
+            dotsInterval = setInterval(() => {
+                if (this.dots.length < 9 && isIncrease) {
+                    this.dots.push("")
+                    if (this.dots.length == 8)
+                        isIncrease = !isIncrease
+                } else {
+                    this.dots.pop()
+                    if (this.dots.length == 1)
+                        isIncrease = !isIncrease
+                }
+            }, 300)
     },
     watch: {
         selectedItems: function (value) {
@@ -224,7 +282,7 @@ export default {
             }
             this.questionsList[this.currentIndex]['userAnswerKeys'] = value
 
-            console.log(JSON.stringify(this.questionsList[this.currentIndex]))
+            // console.log(JSON.stringify(this.questionsList[this.currentIndex]))
         }
     }
 }

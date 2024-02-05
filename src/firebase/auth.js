@@ -1,5 +1,5 @@
 import { app } from '@/firebase/setup'
-import { analytics, logEvent } from '@/firebase/analytics'
+// import { analytics, logEvent } from '@/firebase/analytics'
 import {
     getAuth,
     createUserWithEmailAndPassword,
@@ -23,7 +23,7 @@ const actionCodeSettings = {
     handleCodeInApp: false,
 }
 
-logEvent(analytics, "firebase-authorized" + serverTimestamp)
+// logEvent(analytics, "firebase-authorized" + serverTimestamp)
 
 function handleSignInWithEmailAndPassword(email, password, callback) {
     signInWithEmailAndPassword(auth, email, password)

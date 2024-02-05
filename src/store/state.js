@@ -28,7 +28,8 @@ export default {
         'answerData': {},
         'projectData': {},
         'schedulesData': {},
-        'firestoreDbList': {}
+        'firestoreDbList': {},
+        'allUsersData': {}
     },
     // collectionDataType: {
     collectionDataRefKey: {
@@ -38,7 +39,8 @@ export default {
         'answer': 'answerData',
         'project': 'projectData',
         'listUpQuestionCollection': 'firestoreDbList',
-        'schedules': 'schedulesData'
+        'schedules': 'schedulesData',
+        'users': 'allUsersData',
     },
     // Firebase Collection Relation END
 

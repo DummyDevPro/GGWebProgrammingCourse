@@ -1,34 +1,133 @@
 <template>
-    <div v-if="!getAllStudentProjects" class="loading"></div>
-    <div v-else-if="getAllStudentProjects.length == 0">
-        Students' Projects are not found!
+    <div class="py-3 px-3">
+        <BaseLayout :data="getAllStudentProjects" layoutType="0">
+            <template #item="{ projectTitle, projectOwner, projectUrl, projectImageUrl }">
+                <div class="card">
+                    <img class="card-img-top card-image" :src="projectImageUrl" alt="Default Image">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ projectTitle }}</h5>
+                        <p class="card-text">
+                            <span class="badge bg-dark d-flex flex-column">
+                                <span>Developer</span>
+                                <span>{{ projectOwner }}</span>
+                            </span>
+                        </p>
+                        <a :href="projectUrl" class="btn btn-link" target="_blank">Visit
+                            Site</a>
+                    </div>
+                </div>
+            </template>
+        </BaseLayout>
+        <div v-if="getUserRole && getUserRole == 99" class="text-center">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#myModal">
+                Create New <i class="bi bi-plus fs-6"></i>
+            </button>
+        </div>
     </div>
-    <div v-else class="row gy-3 py-5 px-3 m-0">
-        <!-- d-flex flex-wrap px-3 py-5 gap-4 -->
-        <div v-for="project in getAllStudentProjects" class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3">
-            <div class="card">
-                <!-- style="width: 18rem;" -->
-                <!-- <strong class="image-info position-absolute">Image file will add on next update.</strong> -->
-                <img class="card-img-top card-image" :src="project['project_image']" alt="Default Image">
-                <!-- src="../assets/img/default.png" -->
-                <div class="card-body">
-                    <h5 class="card-title">{{ project['project_title'] }}</h5>
-                    <p class="card-text">
-                        <span class="badge bg-dark">Developer :<wbr> {{ project['userName'] }}</span>
-                    </p>
-                    <a :href="project['project_url']" class="btn btn-link" target="_blank">Visit
-                        Site</a>
+
+    <!-- The Modal -->
+    <div class="modal fade" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Registeration Of Student Project</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <form @submit.prevent="registerStudentProject" ref="registerProjectForm">
+                        <div class="mb-3">
+                            <label for="projectTitle" class="form-label">Project Title</label>
+                            <input type="text" id="projectTitle" class="form-control" v-model="project.projectTitle">
+                        </div>
+                        <div class="mb-3">
+                            <label for="projectOwner" class="form-label">Developer Name</label>
+                            <input type="text" id="projectOwner" class="form-control" v-model="project.projectOwner">
+                        </div>
+                        <div class="mb-3">
+                            <label for="projectImage" class="form-label">Project Demo Image</label>
+                            <input type="file" id="projectImage" class="form-control" accept="image/*" @change="selectFile">
+                        </div>
+                        <div class="mb-3">
+                            <label for="projectUrl" class="form-label">Project URL</label>
+                            <input type="text" id="projectUrl" class="form-control" v-model="project.projectUrl">
+                        </div>
+
+                        <div class="d-flex">
+                            <button type="reset" class="btn btn-danger flex-fill">Clear</button>
+                            <button type="submit" class="btn btn-success flex-fill" :disabled="btnDisable">Register</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 </template>
 <script>
+import BaseLayout from "@/views/BaseLayout.vue"
+
 export default {
+    components: { BaseLayout },
+    data() {
+        return {
+            project: {
+                projectTitle: null,
+                projectUrl: null,
+                projectOwner: null,
+                projectImageFile: null
+            },
+            btnDisable: false
+        }
+    },
+    methods: {
+        selectFile(event) {
+            if (event.target.files && event.target.files[0]) {
+                // Image file read & write
+                const reader = new FileReader
+                reader.onload = e => { }
+                reader.readAsDataURL(event.target.files[0])
+                this.project.projectImageFile = event.target.files[0]
+            }
+        },
+        registerStudentProject() {
+            let emptyCheck = false;
+            Object.keys(this.project).forEach((key) => {
+                if (!this.project[key]) {
+                    emptyCheck = true;
+                    return;
+                }
+            })
+
+            if (!emptyCheck) {
+                this.btnDisable = true
+                this.$store.dispatch('registerStudentProject', this.project)
+                    .then(() => {
+                        this.$store.dispatch('getCollectionData', {
+                            firstAccessCode: 'all',
+                            method: 'get',
+                            collectionKey: 'project'
+                        })
+                    })
+                    .finally(() => {
+                        this.$refs.registerProjectForm.reset();
+                        Object.keys(this.project).forEach((key) => {
+                            this.project[key] = null
+                        })
+                        this.btnDisable = false
+                    })
+            }
+        }
+    },
     computed: {
+        getUserRole() {
+            return this.$store.getters.acquireUserInfo?.userRole
+        },
         getAllStudentProjects() {
             return this.$store.getters.acquireProjectData('all-projects')
-        }
+        },
     },
     mounted() {
         setTimeout(() => {
@@ -42,11 +141,6 @@ export default {
 }
 </script>
 <style scoped>
-.image-info {
-    left: .5rem;
-    top: 1rem;
-}
-
 .card {
     box-shadow: 0 2px 8px gray;
     transition: all .3s linear;

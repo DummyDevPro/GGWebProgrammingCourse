@@ -14,7 +14,7 @@ export default {
                 collectionName: 'user_answers',
                 where: ['uid'],
                 order: {
-                    name: 'uploaded-time',
+                    name: 'createdTimestamp',
                     type: 'desc'
                 }
             },
@@ -23,19 +23,23 @@ export default {
                 collectionName: 'student_projects',
                 where: null,
                 order: {
-                    name: 'project_end_date',
-                    type: 'asc'
+                    name: 'createdTimestamp',
+                    type: 'desc'
                 }
             },
-            // 'question-name-list': {
-            //     saveCollectionName: 'all-questions-name-list',
-            //     collectionName: 'all_collections',
-            //     where: ['type'],
-            // },
-            'listUpQuestionCollection': {
+            listUpQuestionCollection: {
                 saveCollectionName: 'allQuestionsCollection',
                 collectionName: 'all_questions_collection',
                 where: ['type'],
+            },
+            users: {
+                saveCollectionName: 'allUsers',
+                collectionName: 'users',
+                where: null,
+                order: {
+                    name: 'createdTimestamp',
+                    type: 'desc'
+                }
             }
         }
     },

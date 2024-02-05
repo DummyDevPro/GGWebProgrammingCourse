@@ -1,6 +1,6 @@
 import { app } from '@/firebase/setup'
 import { auth } from '@/firebase/auth'
-import { analytics, logEvent } from '@/firebase/analytics'
+// import { analytics, logEvent } from '@/firebase/analytics'
 import {
     getFirestore,
     collection,
@@ -18,7 +18,7 @@ import router from '@/router';
 
 const db = getFirestore(app);
 
-logEvent(analytics, "make-db-connection");
+// logEvent(analytics, "make-db-connection");
 
 async function readSingleDocument(collectionName, docId, callback) {
     if (!auth.currentUser) {
@@ -31,6 +31,7 @@ async function readSingleDocument(collectionName, docId, callback) {
         const docSnap = await getDoc(docRef);
         callback({ 'data': docSnap.exists() ? docSnap.data() : [], 'myStatus': 'success' })
     } catch (error) {
+        console.log(error);
         callback({ ...error, 'myStatus': 'error' })
     }
 }
@@ -58,6 +59,7 @@ async function readSingleDocumentByQuery(collectionName, backUserData, condition
             callback({ 'myStatus': 'error', 'extraMsg': 'このメールで登録したアカウントがありません。' })
         }
     } catch (error) {
+        console.log(error);
         callback({ ...error, 'myStatus': 'error' })
     }
 }
@@ -73,6 +75,7 @@ async function addNewDocumentByCustomDocId(collectionName, docId, data, callback
         await setDoc(docRef, data, { merge: true })
         callback({ 'myStatus': 'success' })
     } catch (error) {
+        console.log(error);
         callback({ ...error, 'myStatus': 'error' })
     }
 }
@@ -96,6 +99,7 @@ async function readCollectionFB(collectionName, condition, order, callback) {
 
         callback({ 'data': responseArr, 'myStatus': 'success' })
     } catch (error) {
+        console.log(error);
         callback({ ...error, 'myStatus': 'error' })
     }
 }
@@ -119,6 +123,7 @@ async function addNewDocumentFB(data, callback) {
 
         callback({ 'data': docRef.id, 'myStatus': 'success' })
     } catch (error) {
+        console.log(error);
         callback({ ...error, 'myStatus': 'error' })
     }
 }
@@ -132,6 +137,7 @@ async function updateExistingDocumentFB(data, collectionName, docId, callback) {
     try {
         await addNewDocumentByCustomDocId(collectionName, docId, data, callback)
     } catch (error) {
+        console.log(error);
         callback({ ...error, 'myStatus': 'error' })
     }
 }

@@ -1,25 +1,19 @@
 <template>
-    <div class="container p-3">
-        <div class="col-12 col-sm-12 col-md-12 col-lg-6 m-auto accordion" id="accordionExample">
-            <div v-if="!getChaptersData" class="loading">
-            </div>
-            <div v-else-if="getChaptersData.length == 0" class="text-center">
-                問題はまだ作成してません。
-            </div>
-            <div v-else class="accordion-item" v-for="ques in getChaptersData">
-                <h2 class="accordion-header" :id="'heading' + ques['docId']">
+    <div class="py-3 px-3">
+        <BaseLayout :data="getChaptersData" layoutType="1">
+            <template #item="{ docId, chapterTitle, chapterSubtitle, details, chapterCodeId }">
+                <h2 class="accordion-header" :id="'heading' + docId">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                        :data-bs-target="'#' + 'collapse' + ques['docId']" aria-expanded="true"
-                        :aria-controls="'collapse' + ques['docId']">
-                        {{ ques['chapterTitle'] }}
+                        :data-bs-target="'#' + 'collapse' + docId" aria-expanded="true" :aria-controls="'collapse' + docId">
+                        {{ chapterTitle }}
                     </button>
                 </h2>
-                <div :id="'collapse' + ques['docId']" class="accordion-collapse collapse"
-                    :aria-labelledby="'heading' + ques['docId']" data-bs-parent="#accordionExample">
+                <div :id="'collapse' + docId" class="accordion-collapse collapse" :aria-labelledby="'heading' + docId"
+                    data-bs-parent="#accordionExample">
                     <div class="accordion-body">
-                        <h6 class="mb-2 color-g-web fw-bold">{{ ques['chapterSubtitle'] }}</h6>
+                        <h6 class="mb-2 color-g-web fw-bold">{{ chapterSubtitle }}</h6>
                         <ul class="ul-wrapper">
-                            <li v-for="detail in ques['details']" class="">
+                            <li v-for="detail in details" class="">
                                 <small>{{ detail }}</small>
                             </li>
                         </ul>
@@ -28,18 +22,21 @@
                         <router-link :to="{
                             name: 'questions-chapter',
                             params: {
-                                'chapter': ques['chapterCodeId'],
+                                'chapter': chapterCodeId,
                             }
                         }" class="btn btn-primary">チャレンジ</router-link>
                     </div>
                 </div>
-            </div>
-        </div>
+            </template>
+        </BaseLayout>
     </div>
 </template>
 
 <script>
+import BaseLayout from "@/views/BaseLayout.vue"
+
 export default {
+    components: { BaseLayout },
     props: ['specific'],
     data() {
         return {

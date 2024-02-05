@@ -8,23 +8,26 @@
         <div class="calendar"></div>
     </div>
 
-    <div class="row text-center gy-4 p-4 m-0">
-        <div class="col-12 col-sm-6 col-md-4">
-            <a href="" class="btn g-web-bg d-block py-5 fs-6 text-white category">メモ</a>
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 text-center gy-4 p-4 m-0">
+        <div class="col">
+            <router-link :to="{ name: 'java-compiler' }" class="btn g-web-bg d-block py-5 fs-6 text-white category">Java
+                Compiler</router-link>
         </div>
-        <div class="col-12 col-sm-6 col-md-4">
+        <div class="col">
             <router-link :to="{ name: 'user-exam-history' }"
                 class="btn g-web-bg d-block py-5 fs-6 text-white category">試験歴</router-link>
         </div>
 
         <!-- Only Admin START -->
-        <div v-if="getUserRole && getUserRole == 99" class="col-12 col-sm-6 col-md-4">
+        <div v-if="getUserRole && getUserRole == 99" class="col">
             <router-link :to="{ name: 'create-exam' }"
                 class="btn g-web-bg d-block py-5 fs-6 text-white category">問題作成</router-link>
         </div>
 
-        <div v-if="getUserRole && getUserRole == 99" class="col-12 col-sm-6 col-md-4">
-            <a href="" class="btn g-web-bg d-block py-5 fs-6 text-white category">メンバーリスト</a>
+        <div v-if="getUserRole && getUserRole == 99" class="col">
+            <router-link :to="{ name: 'all-users' }"
+                class="btn g-web-bg d-block py-5 fs-6 text-white category">メンバーリスト</router-link>
+            <!-- <a href="" class="btn g-web-bg d-block py-5 fs-6 text-white category">メンバーリスト</a> -->
         </div>
         <!-- Only Admin END -->
     </div>

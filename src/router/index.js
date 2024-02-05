@@ -1,8 +1,6 @@
 import AllQuestionsViewVue from '@/views/AllQuestionsView.vue'
-import ContactUsViewVue from '@/views/ContactUsView.vue'
 import HomeViewVue from '@/views/HomeView.vue'
 import UserProfileViewVue from '@/views/UserProfileView.vue'
-import PamphletViewVue from '@/views/PamphletView.vue'
 import QuestionsViewVue from '@/views/QuestionsView.vue'
 import QuestionChaperViewVue from '@/views/QuestionChaperView.vue'
 import ErrorPage from '@/views/404.vue'
@@ -15,6 +13,8 @@ import CreateAccountViewVue from '@/views/CreateAccountView.vue'
 import ExamHistoryViewVue from '@/views/ExamHistoryView.vue'
 import CreateExamViewVue from '@/views/CreateExamView.vue'
 import MailAuthView from '@/views/MailAuthView.vue'
+import AllUsersView from '@/views/AllUsersView.vue'
+import CompilerView from '@/views/CompilerView.vue'
 
 import { createRouter, createWebHashHistory } from 'vue-router'
 import store from '../store/index'
@@ -49,14 +49,6 @@ const routes = [
     path: '/create-acccount',
     name: 'create-acccount',
     component: CreateAccountViewVue,
-    meta: {
-      requiresAuth: false
-    }
-  },
-  {
-    path: '/contact-us',
-    name: 'contact-us',
-    component: ContactUsViewVue,
     meta: {
       requiresAuth: false
     }
@@ -103,14 +95,6 @@ const routes = [
     }
   },
   {
-    path: '/web-pamphlet',
-    name: 'web-pamphlet',
-    component: PamphletViewVue,
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
     path: '/all-years-schedule',
     name: 'all-years-schedule',
     component: AllYearsScheduleViewVue,
@@ -149,6 +133,22 @@ const routes = [
     path: '/user/exam/history',
     name: 'user-exam-history',
     component: ExamHistoryViewVue,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/javaCompiler',
+    name: 'java-compiler',
+    component: CompilerView,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/allUsers',
+    name: 'all-users',
+    component: AllUsersView,
     meta: {
       requiresAuth: true
     }

@@ -5,10 +5,10 @@ import { getStorage, ref, uploadBytes, getDownloadURL, listAll, deleteObject } f
 // Get a reference to the storage service, which is used to create references in your storage bucket
 const storage = getStorage(app);
 
-function handleFileUpload(file, fileType, saveFileType, callback) {
+function handleFileUpload(file, fileType, saveFileType, isPrivate, callback) {
     switch (fileType) {
         case 'image':
-            uploadImage(file, saveFileType, callback)
+            uploadImage(file, saveFileType, isPrivate, callback)
             break;
         default:
             callback({ msg: 'Not supported file type.', 'myStatus': 'error' })
@@ -66,7 +66,7 @@ function downloadUrl(ref, callback) {
     })
 }
 
-function uploadImage(file, saveFileType, callback) {
+function uploadImage(file, saveFileType, isPrivate, callback) {
     // User login status check-up
     if (!auth.currentUser) {
         callback({ msg: 'User is not login.', 'myStatus': 'error' })
@@ -74,7 +74,13 @@ function uploadImage(file, saveFileType, callback) {
     }
 
     // Create a storage reference from our storage service
-    const imgStorageRef = ref(storage, `images/${auth.currentUser.uid}/${saveFileType}/${Date.now() + file.name}`)
+    let imgStorageRef;
+    if (isPrivate) {
+        imgStorageRef = ref(storage, `images/${auth.currentUser.uid}/${saveFileType}/${Date.now() + file.name}`)
+    } else {
+        imgStorageRef = ref(storage, `app/images/${saveFileType}/${Date.now() + file.name}`)
+    }
+
 
     uploadBytes(imgStorageRef, file).then((ss) => {
         downloadUrl(imgStorageRef, callback)

@@ -1,16 +1,34 @@
 <template>
-    <div v-if="!getAllQuestionsNameData" class="loading"></div>
-    <div v-else class="all-mondai-grid my-5 px-5">
-        <all-questions :qnl="getAllQuestionsNameData" />
+    <div class="py-3 px-3">
+        <base-layout :data="getAllQuestionsNameData" layoutType="0">
+            <template #item="{ photo, title, subTitle, specific }">
+                <div class="card">
+                    <img :src="photo" class="card-img-top" style="height: 150px;object-fit: scale-down;">
+
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ title }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted text-truncate">{{ subTitle }}
+                        </h6>
+                    </div>
+
+                    <div class="card-footer text-center">
+                        <router-link :to="{
+                            name: 'questions',
+                            params: {
+                                'specific': specific
+                            }
+                        }" class="btn btn-primary form-control">チャレンジ</router-link>
+                    </div>
+                </div>
+            </template>
+        </base-layout>
     </div>
 </template>
 
 <script>
-import AllQuestions from '@/components/AllQuestions.vue'
+import BaseLayout from "@/views/BaseLayout.vue"
 export default {
-    components: {
-        'all-questions': AllQuestions
-    },
+    components: { 'base-layout': BaseLayout },
     computed: {
         getAllQuestionsNameData() {
             return this.$store.getters.acquireAllQuestionsNameData('allQuestionsCollection')
@@ -31,5 +49,3 @@ export default {
     }
 }
 </script>
-
-<style scoped></style>

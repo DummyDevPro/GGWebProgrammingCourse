@@ -237,6 +237,7 @@ export default {
             file,
             fileType,
             saveFileFolderName,
+            true,
             (response) => {
                 if (response.myStatus === 'success') {
                     // save to firebase/firestore (collection : accounts)
@@ -273,6 +274,36 @@ export default {
             if (response.myStatus === 'success') {
                 context.commit('handleFileDownloadListUpState', response)
             }
+        })
+    },
+    registerStudentProject(context, data) {
+        console.log(data);
+        // update firebase storage/images
+        return new Promise((resolve, __) => {
+            handleFileUpload(
+                data.projectImageFile,
+                'image',
+                'student_projects_image',
+                false,
+                (response) => {
+                    if (response.myStatus === 'success') {
+                        // save to firebase/firestore (collection : student_projects)
+                        addNewDocumentFB(
+                            {
+                                dataObj: {
+                                    projectTitle: data.projectTitle,
+                                    projectUrl: data.projectUrl,
+                                    projectOwner: data.projectOwner,
+                                    projectImageUrl: response.fileUrl
+                                },
+                                collectionName: 'student_projects',
+                                requireUserInfo: true
+                            },
+                            (__) => {
+                                resolve()
+                            })
+                    }
+                })
         })
     }
 }
