@@ -19,7 +19,8 @@ import { sendMail } from '@/assets/js/util'
 const auth = getAuth(app)
 
 const actionCodeSettings = {
-    url: 'http://localhost:8080',
+    // url: 'http://localhost:8080',
+    url: 'https://gaigoweb.onrender.com',
     handleCodeInApp: false,
 }
 

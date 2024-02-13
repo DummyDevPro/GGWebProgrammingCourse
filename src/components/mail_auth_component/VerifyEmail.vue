@@ -1,4 +1,5 @@
 <template>
+    {{ authData.continueUrl }}
     <div class="col-10 col-sm-8 col-md-6 col-lg-5 mx-auto my-3">
         <div v-if="responseStatus === ''">
             <div class="alert alert-info text-center" role="alert">
@@ -50,7 +51,6 @@ export default {
                 .then((response) => {
                     this.responseStatus = response.myStatus
                     if (response.myStatus == 'success') {
-                        console.log('Success');
                         // after user's response
                         // save user email to firebase users collection
                         this.$store.dispatch('addNewDocument', {
