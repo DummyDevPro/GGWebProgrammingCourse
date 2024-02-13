@@ -20,7 +20,7 @@ const auth = getAuth(app)
 
 const actionCodeSettings = {
     // url: 'http://localhost:8080',
-    url: 'https://gaigoweb.onrender.com',
+    url: 'https://gaigoweb.onrender.com/',
     handleCodeInApp: false,
 }
 
