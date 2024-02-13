@@ -103,7 +103,7 @@ export default {
                 },
             },
             question: {
-                saveCollectionName: 'java-bronze',
+                saveCollectionName: 'java-word-problem',
                 collectionName: 'java_word_problem_questions',
                 where: ['chapterCodeId'],
                 // order: {
@@ -129,6 +129,30 @@ export default {
             question: {
                 saveCollectionName: 'itf',
                 collectionName: 'it_fundamental_questions',
+                where: ['chapterCodeId'],
+                // order: {
+                //     name: 'id',
+                //     type: 'asc'
+                // },
+            }
+        },
+        post: {
+        },
+    },
+    'final-exam': {
+        get: {
+            chapter: {
+                saveCollectionName: 'final-exam',
+                collectionName: 'final_exam_overview',
+                where: null,
+                order: {
+                    name: 'chapterCodeId',
+                    type: 'asc'
+                },
+            },
+            question: {
+                saveCollectionName: 'final-exam',
+                collectionName: 'final_exam_questions',
                 where: ['chapterCodeId'],
                 // order: {
                 //     name: 'id',

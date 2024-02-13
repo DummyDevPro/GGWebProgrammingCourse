@@ -17,26 +17,10 @@
 import TopNav from './components/TopNav.vue';
 
 export default {
-  data() {
-    return {
-      alertMsg: null
-    }
-  },
   components: {
     'top-nav': TopNav,
   },
   mounted() {
-
-    this.$store.watch(
-      (state) => state.alertMsg,
-      (newValue, _) => {
-        this.alertMsg = newValue
-        setTimeout(() => {
-          this.alertMsg = null
-        }, 3000);
-      }, { deep: true }
-    )
-
     this.$store.dispatch('initializeApp')
   }
 }

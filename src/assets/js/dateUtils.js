@@ -26,6 +26,11 @@ function makeTwoDigit(data) {
 }
 
 
+function convertTimeStampToDateTime(timestamp, isSec = false) {
+    return convertTimeStampToDate(timestamp, isSec) + " " + convertTimeStampToTime(timestamp, isSec)
+}
+
+
 function convertTimeStampToTime(timestamp, isSec = false) {
     let date = new Date(isSec ? timestamp : timestamp.seconds * 1000)
     let hours = makeTwoDigit(date.getHours())
@@ -52,5 +57,6 @@ export {
     currentTime,
     getAllTimeZone,
     convertTimeStampToDate,
-    convertTimeStampToTime
+    convertTimeStampToTime,
+    convertTimeStampToDateTime
 }

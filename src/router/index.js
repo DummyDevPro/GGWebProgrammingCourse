@@ -189,10 +189,10 @@ router.beforeEach((to, from, next) => {
   } else {
     next({ name: 'not-found', replace: true })
   }
-  store.state.alertMsg.status = null
-  store.state.alertMsg.message = null
-  store.state.alertMsg.time = null
-  store.state.alertMsg.extraMsg = null
+  // store.state.alertMsg.status = null
+  // store.state.alertMsg.message = null
+  // store.state.alertMsg.time = null
+  // store.state.alertMsg.extraMsg = null
 })
 
 export default router

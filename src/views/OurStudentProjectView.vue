@@ -20,7 +20,7 @@
         </BaseLayout>
         <div v-if="getUserRole && getUserRole == 99" class="text-center">
             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#myModal">
-                Create New <i class="bi bi-plus fs-6"></i>
+                Add New Project <i class="bi bi-plus fs-6"></i>
             </button>
         </div>
     </div>
@@ -32,7 +32,7 @@
 
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <h4 class="modal-title">Registeration Of Student Project</h4>
+                    <h4 class="modal-title">Add New Student Project</h4>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
 
@@ -57,8 +57,10 @@
                         </div>
 
                         <div class="d-flex">
-                            <button type="reset" class="btn btn-danger flex-fill">Clear</button>
-                            <button type="submit" class="btn btn-success flex-fill" :disabled="btnDisable">Register</button>
+                            <button type="reset" class="btn btn-danger w-50">Clear</button>
+                            <button type="submit" class="btn btn-success w-50" :disabled="btnDisable">
+                                Save
+                            </button>
                         </div>
                     </form>
                 </div>

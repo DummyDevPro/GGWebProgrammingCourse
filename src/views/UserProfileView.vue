@@ -205,7 +205,8 @@ export default {
                 firstAccessCode: 'profile',
                 method: 'get',
                 collectionKey: 'account',
-                docId: this.getFirebaseUserInfo.uid
+                docId: this.getFirebaseUserInfo.uid,
+                init: true
             })
 
             this.$store.dispatch('getAllImages')

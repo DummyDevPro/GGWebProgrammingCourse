@@ -50,6 +50,7 @@ export default {
                 .then((response) => {
                     this.responseStatus = response.myStatus
                     if (response.myStatus == 'success') {
+                        console.log('Success');
                         // after user's response
                         // save user email to firebase users collection
                         this.$store.dispatch('addNewDocument', {

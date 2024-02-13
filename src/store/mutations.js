@@ -60,9 +60,9 @@ export default {
         state.profile.allImages = obj.allImages
     },
     alertMsg: (state, obj) => {
-        state.alertMsg.status = obj.myStatus
-        state.alertMsg.message = obj.code ? obj.code : null
-        state.alertMsg.time = Date.now()
-        state.alertMsg.extraMsg = obj.extraMsg ? obj.extraMsg : null
+        // state.alertMsg.status = obj.myStatus
+        // state.alertMsg.message = obj.code ? obj.code : null
+        // state.alertMsg.time = Date.now()
+        // state.alertMsg.extraMsg = obj.extraMsg ? obj.extraMsg : null
     }
 }

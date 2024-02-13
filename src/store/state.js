@@ -67,10 +67,10 @@ export default {
             }
         }
     },
-    alertMsg: {
-        status: null,
-        message: null,
-        time: null,
-        extraMsg: null
-    }
+    // alertMsg: {
+    //     status: null,
+    //     message: null,
+    //     time: null,
+    //     extraMsg: null
+    // }
 }

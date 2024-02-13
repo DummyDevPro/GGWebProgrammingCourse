@@ -1,8 +1,12 @@
 <template>
     <div class="wrapper">
-        <div v-if="getChapterInfo" class="page-header text-center">
-            <h1>{{ getChapterInfo['chapterTitle'] }}</h1>
-            <h2 class="text-secondary">{{ getChapterInfo['chapterSubtitle'] }}</h2>
+        <div v-if="getChapterInfo" class="bg-dark text-white px-3 d-flex align-items-center"
+            style="position: sticky;top:72px;">
+            <span class="fs-5">{{ getChapterInfo['chapterTitle'] }}</span>
+            <span class="fs-5 text-warning"><i class="bi bi-chevron-compact-right"></i></span>
+            <span class="small">{{ getChapterInfo['chapterSubtitle'] }}</span>
+
+            <span class="ms-auto">{{ startDateTimeFormatted }}</span>
         </div>
 
         <div v-if="!questionsList" class="m-auto py-5" style="width: max-content;">
@@ -85,6 +89,8 @@
 </template>
 
 <script>
+import { convertTimeStampToDateTime } from '@/assets/js/dateUtils';
+
 var dotsInterval;
 var isIncrease = true;
 export default {
@@ -103,12 +109,14 @@ export default {
             dots: [""],
 
             chapterInfo: null,
-            startDateTime: null
+            startDateTime: null,
+            startDateTimeFormatted: null,
         }
     },
     methods: {
         recordStartDate() {
             this.startDateTime = Date.now()
+            this.startDateTimeFormatted = convertTimeStampToDateTime(this.startDateTime, true)
         },
         stopDotsInterval() {
             clearInterval(dotsInterval)
