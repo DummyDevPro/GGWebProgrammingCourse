@@ -59,7 +59,7 @@ async function handleCreateUserWithEmailAndPassword(email, password, callback) {
 function handleSendEmailVerification(user, email, callback) {
     // send verification url 
     let acs = actionCodeSettings
-    acs.url += `/home?email=${email}`
+    acs.url += `home?email=${email}`
 
     sendEmailVerification(user, acs)
         .then(() => {

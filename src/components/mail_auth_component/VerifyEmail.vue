@@ -1,5 +1,4 @@
 <template>
-    {{ authData.continueUrl }}
     <div class="col-10 col-sm-8 col-md-6 col-lg-5 mx-auto my-3">
         <div v-if="responseStatus === ''">
             <div class="alert alert-info text-center" role="alert">
