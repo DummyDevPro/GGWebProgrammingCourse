@@ -185,7 +185,7 @@ export default {
                         'totalCorrectCount': totalTrueCount,
                         'totalQuestionsCount': this.questionsList.length,
                         'chapterCodeId': this.chapter,
-                        'subject': this.chapterInfo?.[0]?.subject,
+                        'subject': this.chapterInfo?.[0]?.subject ?? '',
                         'startDateTime': this.startDateTime
                     },
                     collectionName: 'user_answers',
