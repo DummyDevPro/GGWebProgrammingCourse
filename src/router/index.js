@@ -14,7 +14,7 @@ import ExamHistoryViewVue from '@/views/ExamHistoryView.vue'
 import CreateExamViewVue from '@/views/CreateExamView.vue'
 import MailAuthView from '@/views/MailAuthView.vue'
 import AllUsersView from '@/views/AllUsersView.vue'
-import CompilerView from '@/views/CompilerView.vue'
+import DirectSaveJsonDataToFB from '@/views/DirectSaveJsonDataToFB.vue'
 
 import { createRouter, createWebHashHistory } from 'vue-router'
 import store from '../store/index'
@@ -138,9 +138,9 @@ const routes = [
     }
   },
   {
-    path: '/javaCompiler',
-    name: 'java-compiler',
-    component: CompilerView,
+    path: '/uploadJsonData',
+    name: 'save-json-data-to-firebase',
+    component: DirectSaveJsonDataToFB,
     meta: {
       requiresAuth: true
     }

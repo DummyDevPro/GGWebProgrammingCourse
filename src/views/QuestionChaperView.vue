@@ -115,8 +115,10 @@ export default {
     },
     methods: {
         recordStartDate() {
-            this.startDateTime = Date.now()
-            this.startDateTimeFormatted = convertTimeStampToDateTime(this.startDateTime, true)
+            if (!this.startDateTime) {
+                this.startDateTime = Date.now()
+                this.startDateTimeFormatted = convertTimeStampToDateTime(this.startDateTime, true)
+            }
         },
         stopDotsInterval() {
             clearInterval(dotsInterval)

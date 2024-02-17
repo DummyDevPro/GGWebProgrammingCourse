@@ -9,24 +9,26 @@
     </div>
 
     <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 text-center gy-4 p-4 m-0">
-        <div class="col">
-            <router-link :to="{ name: 'java-compiler' }" class="btn g-web-bg d-block py-5 fs-6 text-white category">Java
-                Compiler</router-link>
+        <div v-if="getUserRole && getUserRole == 99" class="col">
+            <router-link :to="{ name: 'save-json-data-to-firebase' }"
+                class="btn g-web-bg d-block py-5 fs-6 text-white category h-100">
+                <span>Upload Json Data<wbr> To Firebase</span>
+            </router-link>
         </div>
         <div class="col">
             <router-link :to="{ name: 'user-exam-history' }"
-                class="btn g-web-bg d-block py-5 fs-6 text-white category">試験歴</router-link>
+                class="btn g-web-bg d-block py-5 fs-6 text-white category h-100">試験歴</router-link>
         </div>
 
         <!-- Only Admin START -->
         <div v-if="getUserRole && getUserRole == 99" class="col">
             <router-link :to="{ name: 'create-exam' }"
-                class="btn g-web-bg d-block py-5 fs-6 text-white category">問題作成</router-link>
+                class="btn g-web-bg d-block py-5 fs-6 text-white category h-100">問題作成</router-link>
         </div>
 
         <div v-if="getUserRole && getUserRole == 99" class="col">
             <router-link :to="{ name: 'all-users' }"
-                class="btn g-web-bg d-block py-5 fs-6 text-white category">メンバーリスト</router-link>
+                class="btn g-web-bg d-block py-5 fs-6 text-white category h-100">メンバーリスト</router-link>
             <!-- <a href="" class="btn g-web-bg d-block py-5 fs-6 text-white category">メンバーリスト</a> -->
         </div>
         <!-- Only Admin END -->
