@@ -76,9 +76,16 @@ export default {
     mounted() {
         setTimeout(() => {
             this.$store.dispatch('getCollectionData', {
-                firstAccessCode: 'all',
-                method: 'get',
-                collectionKey: 'users'
+                collectionName: 'users',
+                wheres: [],
+                orders: [
+                    {
+                        name: 'createdTimestamp',
+                        type: 'desc'
+                    }
+                ],
+                groupName: 'allUsersData',
+                saveCollectionName: 'allUsers',
             })
         }, 1500);
     }

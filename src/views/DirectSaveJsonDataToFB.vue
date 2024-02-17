@@ -55,13 +55,13 @@ export default {
     mounted() {
         setTimeout(() => {
             this.$store.dispatch('getCollectionData', {
-                firstAccessCode: 'all',
-                method: 'get',
-                collectionKey: 'listUpQuestionCollection',
-                where: [{
-                    whereValue: 'question',
-                    whereOperator: '=='
-                }],
+                collectionName: 'all_questions_collection',
+                wheres: [
+                    { key: 'type', opt: '==', value: 'question' }
+                ],
+                orders: [],
+                groupName: 'firestoreDbList',
+                saveCollectionName: 'allQuestionsCollection',
             })
         }, 1500);
     }

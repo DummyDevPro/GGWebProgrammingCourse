@@ -55,9 +55,16 @@ export default {
     mounted() {
         setTimeout(() => {
             this.$store.dispatch('getCollectionData', {
-                firstAccessCode: this.collectionName,
-                method: 'get',
-                collectionKey: 'chapter',
+                collectionName: this.collectionName + "_overview",
+                wheres: [],
+                orders: [
+                    {
+                        name: 'chapterCodeId',
+                        type: 'asc'
+                    }
+                ],
+                groupName: 'chapterData',
+                saveCollectionName: this.collectionName,
             })
         }, 1500);
     }

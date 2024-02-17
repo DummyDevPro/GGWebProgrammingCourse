@@ -52,13 +52,18 @@ export default {
             this.fsCollection.chapterName = ''
             this.chapterList = []
             this.chapterList = this.$store.getters.acquireChapterData(this.fsCollection.selectedCollectionSpecificKey)
-            // if (!this.chapterList) {
             this.$store.dispatch('getCollectionData', {
-                firstAccessCode: this.fsCollection.selectedCollectionSpecificKey,
-                method: 'get',
-                collectionKey: 'chapter',
+                collectionName: this.fsCollection.selectedCollectionSpecificKey + "_overview",
+                wheres: [],
+                orders: [
+                    {
+                        name: 'chapterCodeId',
+                        type: 'asc'
+                    }
+                ],
+                groupName: 'chapterData',
+                saveCollectionName: this.fsCollection.selectedCollectionSpecificKey,
             })
-            // }
         },
         showCreateChapterModal() {
             this.$emit('callbackId', this.id)
@@ -79,13 +84,13 @@ export default {
 
         setTimeout(() => {
             this.$store.dispatch('getCollectionData', {
-                firstAccessCode: 'all',
-                method: 'get',
-                collectionKey: 'listUpQuestionCollection',
-                where: [{
-                    whereValue: 'question',
-                    whereOperator: '=='
-                }],
+                collectionName: 'all_questions_collection',
+                wheres: [
+                    { key: 'type', opt: '==', value: 'question' }
+                ],
+                orders: [],
+                groupName: 'firestoreDbList',
+                saveCollectionName: 'allQuestionsCollection',
             })
         }, 1500);
     }

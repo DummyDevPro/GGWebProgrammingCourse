@@ -35,7 +35,10 @@ export default {
         state.logoutModalState = null
     },
     getCollectionDataState: (state, obj) => {
-        state.collectionData[state.collectionDataRefKey[obj.collectionType]][obj.collectionName] = obj.response
+        console.log(state);
+        state.collectionData[obj.groupName][obj.saveCollectionName] = obj.response
+        console.log(state.collectionData);
+        // state.collectionData[state.collectionDataRefKey[obj.collectionType]][obj.collectionName] = obj.response
     },
     addNewDocumentState: (state, res) => {
     },

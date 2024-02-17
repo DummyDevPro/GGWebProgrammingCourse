@@ -108,9 +108,16 @@ export default {
                 this.$store.dispatch('registerStudentProject', this.project)
                     .then(() => {
                         this.$store.dispatch('getCollectionData', {
-                            firstAccessCode: 'all',
-                            method: 'get',
-                            collectionKey: 'project'
+                            collectionName: 'student_projects',
+                            wheres: [],
+                            orders: [
+                                {
+                                    name: 'createdTimestamp',
+                                    type: 'desc'
+                                }
+                            ],
+                            groupName: 'projectData',
+                            saveCollectionName: 'all-projects',
                         })
                     })
                     .finally(() => {
@@ -134,9 +141,16 @@ export default {
     mounted() {
         setTimeout(() => {
             this.$store.dispatch('getCollectionData', {
-                firstAccessCode: 'all',
-                method: 'get',
-                collectionKey: 'project'
+                collectionName: 'student_projects',
+                wheres: [],
+                orders: [
+                    {
+                        name: 'createdTimestamp',
+                        type: 'desc'
+                    }
+                ],
+                groupName: 'projectData',
+                saveCollectionName: 'all-projects',
             })
         }, 1500);
     }

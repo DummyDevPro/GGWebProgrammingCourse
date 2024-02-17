@@ -271,6 +271,8 @@ export default {
                 data['chapterCodeId'] = qObj.fsCollection.chapterName
 
                 const spfKey = qObj.fsCollection.selectedCollectionSpecificKey
+
+                TODO
                 const collectionName = this.$store.state.collectionRelation[spfKey]['get']['question']['collectionName']
 
                 // console.log(data);
@@ -295,6 +297,8 @@ export default {
         createNewChapter() {
             this.newChapt['details'] = this.newChapt['details'].split('\n')
             const spfKey = this.questions[this.modalAccessId].fsCollection.selectedCollectionSpecificKey
+
+            TODO
             const collectionName = this.$store.state.collectionRelation[spfKey]['get']['chapter']['collectionName']
             this.$store.dispatch('addNewDocument', {
                 dataObj: { ...this.newChapt },

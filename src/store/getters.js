@@ -34,6 +34,7 @@ export default {
         return state.collectionData['answerData'][saveCollectionName]
     },
     acquireProjectData: state => saveCollectionName => {
+        console.log(state.collectionData['projectData'][saveCollectionName]);
         return state.collectionData['projectData'][saveCollectionName]
     },
     acquireScheduleData: state => saveCollectionName => {

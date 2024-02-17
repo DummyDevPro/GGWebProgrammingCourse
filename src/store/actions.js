@@ -74,23 +74,9 @@ export default {
         context.commit('updateLogoutModalState')
     },
     getCollectionData(context, obj) {
-        const prepareData = context
-            .state
-            .collectionRelation[obj.firstAccessCode][obj.method][obj.collectionKey]
-        const collectionName = prepareData.collectionName
-        let condition = '';
-        if (prepareData.where != null && obj.where) {
-            condition = [];
-            for (let i = 0; i < obj.where.length; i++) {
-                condition.push(
-                    { key: prepareData.where[i], opt: obj.where[i].whereOperator, value: obj.where[i].whereValue }
-                )
-            }
-        }
-        const order = [prepareData.order]
         if (obj.docId) {
             readSingleDocument(
-                collectionName,
+                obj.collectionName,
                 obj.docId,
                 ((response) => {
                     if (response.myStatus == 'error') {
@@ -108,8 +94,8 @@ export default {
                                     context.commit('getCollectionDataState',
                                         {
                                             response: response.data,
-                                            collectionName: prepareData.saveCollectionName,
-                                            collectionType: obj.collectionKey
+                                            groupName: obj.groupName,
+                                            saveCollectionName: obj.saveCollectionName
                                         })
                                 })
                         }
@@ -117,17 +103,18 @@ export default {
                             context.commit('getCollectionDataState',
                                 {
                                     response: response.data,
-                                    collectionName: prepareData.saveCollectionName,
-                                    collectionType: obj.collectionKey
+                                    groupName: obj.groupName,
+                                    saveCollectionName: obj.saveCollectionName
                                 })
                         }
                     }
                 })
             )
         } else {
-            readCollectionFB(collectionName
-                , condition
-                , order
+            readCollectionFB(
+                obj.collectionName
+                , obj.wheres
+                , obj.orders
                 , (response) => {
                     if (response.myStatus == 'error') {
                         // context.commit('alertMsg', { ...response, })
@@ -135,8 +122,8 @@ export default {
                         context.commit('getCollectionDataState',
                             {
                                 response: response.data,
-                                collectionName: prepareData.saveCollectionName,
-                                collectionType: obj.collectionKey
+                                groupName: obj.groupName,
+                                saveCollectionName: obj.saveCollectionName
                             })
                     }
                 })

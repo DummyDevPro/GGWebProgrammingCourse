@@ -103,19 +103,19 @@ export default {
 
         setTimeout(() => {
             this.$store.dispatch('getCollectionData', {
-                firstAccessCode: 'year-schedule',
-                method: 'get',
-                collectionKey: 'schedules',
-                where: [
+                collectionName: 'all_years_schedule',
+                wheres: [
+                    { key: 'school_year', opt: '==', value: parseInt(this.year) },
+                    { key: 'grade', opt: '==', value: this.grade }
+                ],
+                orders: [
                     {
-                        whereValue: parseInt(this.year),
-                        whereOperator: '=='
-                    },
-                    {
-                        whereValue: this.grade,
-                        whereOperator: '=='
+                        name: 'part',
+                        type: 'asc'
                     }
                 ],
+                groupName: 'schedulesData',
+                saveCollectionName: 'year-schedule',
             })
         }, 1500);
     }

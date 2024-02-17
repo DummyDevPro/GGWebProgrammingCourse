@@ -202,9 +202,11 @@ export default {
         // Load user profile data from firebase after 1s of page mounted
         setTimeout(() => {
             this.$store.dispatch('getCollectionData', {
-                firstAccessCode: 'profile',
-                method: 'get',
-                collectionKey: 'account',
+                collectionName: 'users_profile',
+                wheres: [],
+                orders: [],
+                groupName: 'userProfileData',
+                saveCollectionName: 'user-profile',
                 docId: this.getFirebaseUserInfo.uid,
                 init: true
             })

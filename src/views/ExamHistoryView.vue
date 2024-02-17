@@ -92,13 +92,18 @@ export default {
     mounted() {
         setTimeout(() => {
             this.$store.dispatch('getCollectionData', {
-                firstAccessCode: 'all',
-                method: 'get',
-                collectionKey: 'answer',
-                where: [{
-                    whereValue: this.$store.getters.acquireUserInfo.uid,
-                    whereOperator: '=='
-                }],
+                collectionName: 'user_answers',
+                wheres: [
+                    { key: 'uid', opt: '==', value: this.$store.getters.acquireUserInfo.uid }
+                ],
+                orders: [
+                    {
+                        name: 'createdTimestamp',
+                        type: 'desc'
+                    }
+                ],
+                groupName: 'answerData',
+                saveCollectionName: 'all-answers',
             })
         }, 1500);
     }

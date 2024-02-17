@@ -226,9 +226,16 @@ export default {
             if (!this.chapterInfo) {
                 setTimeout(() => {
                     this.$store.dispatch('getCollectionData', {
-                        firstAccessCode: this.questionName,
-                        method: 'get',
-                        collectionKey: 'chapter',
+                        collectionName: this.questionName + "_overview",
+                        wheres: [],
+                        orders: [
+                            {
+                                name: 'chapterCodeId',
+                                type: 'asc'
+                            }
+                        ],
+                        groupName: 'chapterData',
+                        saveCollectionName: this.questionName,
                     })
                 }, 1500);
             }
@@ -253,13 +260,13 @@ export default {
 
         setTimeout(() => {
             this.$store.dispatch('getCollectionData', {
-                firstAccessCode: this.questionName,
-                method: 'get',
-                collectionKey: 'question',
-                where: [{
-                    whereValue: this.chapterId,
-                    whereOperator: '=='
-                }],
+                collectionName: this.questionName + "_questions",
+                wheres: [
+                    { key: 'chapterCodeId', opt: '==', value: this.chapterId }
+                ],
+                orders: [],
+                groupName: 'questionData',
+                saveCollectionName: this.questionName,
             })
         }, 1500);
 
