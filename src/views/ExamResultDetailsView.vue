@@ -55,6 +55,35 @@
                             </label>
                         </div>
                     </div>
+
+                    <!-- userAnswerSourceCode -->
+                    <div v-if="answerDataWrapper['answersData'][currentIndex]['userAnswerSourceCode']">
+                        <div class="mb-3">
+                            <textarea v-model="answerDataWrapper['answersData'][currentIndex]['userAnswerSourceCode']"
+                                class="form-control" rows="10" disabled></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                Credit the answer :
+                                <span v-if="answerDataWrapper['answersData'][currentIndex].credit == false">
+                                    Uncorrect
+                                </span>
+                                <span v-else-if="answerDataWrapper['answersData'][currentIndex].credit == true">
+                                    Correct
+                                </span>
+                                <span v-else>
+                                    Unchecked
+                                </span>
+                            </div>
+
+                            <!-- Teacher/Admin -->
+                            <div v-if="getUserRole && getUserRole == 99" class="d-flex gap-1 ">
+                                <button class="btn btn-success" @click="giveCredit(true)">〇</button>
+                                <button class="btn btn-danger" @click="giveCredit(false)">✕</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="question-change-actions">
@@ -64,8 +93,11 @@
                     <button @click="changeQuestion('plus')" class="g-web-bg p-2 next rounded"
                         :class="currentIndex == (answerDataWrapper['answersData'].length - 1) ? 'btn-remove' : ''">次</button>
 
-                    <button @click="backToProfile" class="btn btn-success"
+                    <button @click="backToProfile" class="btn btn-secondary"
                         v-if="currentIndex == (answerDataWrapper['answersData'].length - 1)">試験履歴へ戻る</button>
+
+                    <button @click="updateStudentExamData" class="btn btn-success"
+                        v-if="currentIndex == (answerDataWrapper['answersData'].length - 1) && markCredit">Credit登録</button>
                 </div>
             </div>
         </div>
@@ -77,10 +109,28 @@ export default {
     data() {
         return {
             'currentIndex': 0,
-            'answerDataWrapper': null
+            'answerDataWrapper': null,
+
+            // Teacher checks student exam data and marks (〇,✕)
+            markCredit: false
+        }
+    },
+    computed: {
+        getUserRole() {
+            return this.$store.getters.acquireUserInfo?.userRole
         }
     },
     methods: {
+        giveCredit(credit) {
+            // Remind > Teacher Give Credit
+            // Show Flag > Button > Credit登録
+            this.markCredit = true;
+            this.answerDataWrapper['answersData'][this.currentIndex].credit = credit
+        },
+        updateStudentExamData() {
+            console.log(this.answerDataWrapper);
+            // update firestore
+        },
         backToProfile() {
             this.$store.dispatch('backOneHistory')
         },

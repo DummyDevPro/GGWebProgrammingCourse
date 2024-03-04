@@ -31,17 +31,21 @@
             {{ recordStartDate() }}
             <!-- v-if="questionsList != null && questionsList.length != 0" -->
             <div class="qiestion-item overflow-auto">
+
+                <!-- 題名部分 -->
                 <div class="question-title d-flex mb-3 p-2">
                     <span class="q-no">{{ `(${currentIndex + 1})` }}</span>
                     <span class="q-text">{{ questionsList[currentIndex]['questionTitle'] }}</span>
                 </div>
 
+                <!-- Java Source Code部分 -->
                 <div v-if="questionsList[currentIndex]['questionCode']" class="question-code p-2">
                     <pre v-for="qCode in questionsList[currentIndex]['questionCode']"
                         class="code-layout ps-3"><code><ol><li v-for="(line, index) in formattingJavaCode(qCode)">{{ line.textContent }}</li></ol></code></pre>
                     <!-- <span v-for="(line, index) in formattingJavaCode(qCode)"><span class="d-flex"><span class="pe-3 prevent-select" style="flex: 0 0 3.5rem;text-align: right;">{{ index + 1 + '.' }}</span><span style="display: inline-block;">{{ line.textContent }}</span></span></span> -->
                 </div>
 
+                <!-- Java Source Codeの実行結果部分 -->
                 <div class="question-code-output p-2 mb-3" v-if="questionsList[currentIndex]['questionCodeOutput']">
                     <p>【表示結果】</p>
                     <div class="bg-code-output px-2 py-3">
@@ -51,6 +55,7 @@
                     </div>
                 </div>
 
+                <!-- Java Source Codeの実行方法部分 -->
                 <div class="question-code-run p-2 mb-3" v-if="questionsList[currentIndex]['questionCodeCommdaLines']">
                     <p>【実行方法】</p>
                     <div class="bg-dark text-white  px-2 py-3">
@@ -60,8 +65,9 @@
                     </div>
                 </div>
 
+                <!-- 選択肢部分 -->
                 <div class="question-choice ps-4 pe-4 mb-3 d-flex flex-column gap-3">
-                    <div class="d-flex align-items-start"
+                    <div v-if="questionsList[currentIndex]['questionMultiChoices']" class="d-flex align-items-start"
                         v-for="choice, key in questionsList[currentIndex]['questionMultiChoices']">
                         <div>
                             <input type="checkbox" :value="key" v-model="selectedItems" :id="key" :disabled="selectedItems.length == questionsList[currentIndex]['numOfQuestionAnswers']
@@ -71,8 +77,14 @@
                             <label :for="key" class="ps-2 d-block" v-for="ch in formatChoice(choice)">{{ ch }}</label>
                         </div>
                     </div>
+                    <div v-else>
+                        <label for="javaCode" class="mb-2">Main.java</label>
+                        <textarea id="javaCode" class="form-control" rows="10" placeholder="place java code"
+                            v-model="questionsList[currentIndex]['userAnswerSourceCode']"></textarea>
+                    </div>
                 </div>
 
+                <!-- 問題切り替えアクション部分 -->
                 <div class="question-change-actions">
                     <button @click="changeQuestion('minus')" class="g-web-bg p-2 back rounded"
                         :class="currentIndex == 0 ? 'btn-remove' : ''">戻る</button>
@@ -141,6 +153,11 @@ export default {
             if (this.questionsList != null && this.questionsList[this.currentIndex]['userAnswerKeys']) {
                 this.selectedItems = this.questionsList[this.currentIndex]['userAnswerKeys']
             } else {
+                if (!this.questionsList[this.currentIndex]['questionMultiChoices']) {
+                    if (!this.questionsList[this.currentIndex]['userAnswerSourceCode']) {
+                        this.questionsList[this.currentIndex]['userAnswerSourceCode'] = ''
+                    }
+                }
                 this.selectedItems = []
             }
         },
@@ -174,7 +191,19 @@ export default {
         addNewDocument() {
             window.removeEventListener('beforeunload', this.beforeUnloadListener, { capture: true })
             if (confirm("試験完了で宜しいですか？") == true) {
+                // console.log(this.questionsList);
+                // console.log(this.$store.getters.acquireAllQuestionsNameData('selectedQuestion'));
+                // return;
                 this.isSubmit = true
+
+                // subject
+                let selQ = this.$store.getters.acquireAllQuestionsNameData('selectedQuestion')
+                let subject = ''
+                if (selQ && selQ[0] && selQ[0].title) {
+                    // subject = selQ[0].title + ' 》' + selQ[0].subTitle ?? ''
+                    subject = selQ[0].title
+                }
+
                 let totalTrueCount = 0
                 this.questionsList.forEach(element => {
                     if (element['result'] != null && element['result']) {
@@ -187,12 +216,12 @@ export default {
                         'totalCorrectCount': totalTrueCount,
                         'totalQuestionsCount': this.questionsList.length,
                         'chapterCodeId': this.chapter,
-                        'subject': this.chapterInfo?.[0]?.subject ?? '',
+                        'subject': subject,
                         'startDateTime': this.startDateTime
                     },
                     collectionName: 'user_answers',
                     requireUserInfo: true,
-                    // After data insertion to firestore is finished
+                    // When data insertion to firestore is finished
                     // Redirect to your exam history page
                     redirectPath: 'user-exam-history'
                 })
@@ -239,21 +268,40 @@ export default {
                     })
                 }, 1500);
             }
-            // console.log(this.chapterInfo);
             return this.chapterInfo?.[0] ?? null
         }
     },
     mounted() {
 
+        // TODO load subject type for current chapter 
+
         // console.log(this.specific);
+        // console.log(this.$store.getters.acquireAllQuestionsNameData('selectedQuestion'));
         // console.log(this.chapter);
+
+        setTimeout(() => {
+            this.$store.dispatch('getCollectionData', {
+                collectionName: 'all_questions_collection',
+                wheres: [
+                    { key: 'type', opt: '==', value: 'question' },
+                    { key: 'specific', opt: '==', value: this.specific },
+                ],
+                orders: [],
+                groupName: 'firestoreDbList',
+                saveCollectionName: 'selectedQuestion',
+            })
+        }, 1500);
 
         this.$store.watch(
             (_, getters) => getters.acquireQuestionsData(this.questionName),
             (newValue, _) => {
                 this.questionsList = this.shuffleArray(newValue)
                 if (this.questionsList != null && this.questionsList.length > 0) {
-                    this.questionsList[0]['userAnswerKeys'] = []
+                    if (this.questionsList[0]['questionMultiChoices']) {
+                        this.questionsList[0]['userAnswerKeys'] = []
+                    } else {
+                        this.questionsList[0]['userAnswerSourceCode'] = ''
+                    }
                 }
             }
         )
@@ -286,6 +334,11 @@ export default {
     },
     watch: {
         selectedItems: function (value) {
+            if (!value || !this.questionsList[this.currentIndex]['questionAnswerKeys']) {
+                // if (this.questionsList[this.currentIndex]['userAnswerKeys']) delete this.questionsList[this.currentIndex]['userAnswerKeys']
+                // console.log(value);
+                return;
+            }
             if (this.questionsList[this.currentIndex]['questionAnswerKeys'].length == value.length) {
                 let flg = true;
                 value.forEach(ans => {

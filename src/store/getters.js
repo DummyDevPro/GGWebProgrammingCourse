@@ -52,6 +52,9 @@ export default {
     acquireAllQuestionsNameData: state => saveCollectionName => {
         return state.collectionData['firestoreDbList'][saveCollectionName]
     },
+    acquireSelectedQuestionNameData: state => saveCollectionName => {
+        return state.collectionData['firestoreDbList'][saveCollectionName]
+    },
     acquireAllUsers: state => saveCollectionName => {
         return state.collectionData['allUsersData'][saveCollectionName]
     }

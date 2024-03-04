@@ -35,7 +35,7 @@
             </div>
 
             <!-- layout type = 2 : Table Layout -->
-            <table v-if="layoutType == 2" class="table">
+            <table v-if="layoutType == 2" class="table table-striped table-hover">
                 <thead>
                     <tr>
                         <th scope="col">#</th>
@@ -44,7 +44,8 @@
                 </thead>
 
                 <tbody>
-                    <tr v-for="(item, index) in data.slice(start, end)" @click="rowClickComp(item.docId)">
+                    <tr v-for="(item, index) in data.slice(start, end)" @click="rowClickComp(item.docId)"
+                        style="cursor: pointer;">
                         <th scope="row">{{ start + index + 1 }}</th>
                         <slot name="body" v-bind="item" />
                     </tr>

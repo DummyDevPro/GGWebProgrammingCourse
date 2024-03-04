@@ -5,7 +5,7 @@
             <div class="d-flex flex-column align-items-center">
 
                 <div class="question-container col-12 col-sm-11 col-md-8 col-lg-6 d-flex flex-column gap-3">
-                    <div v-for="(__, idx) in  questions " class="question">
+                    <div v-for="(__, idx) in  questions " class="question" :key="idx">
                         <div class="up-action d-flex justify-content-between">
                             <div class="up-action-left bg-dark rounded-top d-flex" data-bs-toggle="dropdown"
                                 aria-expanded="false">
@@ -36,8 +36,8 @@
                                 </ul>
                             </div>
                             <div class="up-action-right bg-dark rounded-top d-flex">
-                                <!-- TODO duplicateQuestionLayout(idx) -->
-                                <a href="#" @click.prevent="" class="text-white d-block px-2 py-1 fs-5"
+                                <a href="#" @click.prevent="duplicateQuestionLayout(idx)"
+                                    class="text-white d-block px-2 py-1 fs-5"
                                     title="Duplicate Layout | In the process of developing.">
                                     <i class="bi bi-copy"></i>
                                 </a>
@@ -45,7 +45,7 @@
                                     class="text-white d-block px-2 py-1 fs-5">
                                     <i class="bi bi-plus-lg" title="New Layout"></i>
                                 </a>
-                                <a href="#" @click.prevent="deleteCurrentQuestionLayout(idx)"
+                                <a v-if="idx > 0" href="#" @click.prevent="deleteCurrentQuestionLayout(idx)"
                                     class="text-white d-block px-2 py-1 fs-5" title="Delete Layout">
                                     <i class="bi bi-dash-lg"></i>
                                 </a>
@@ -202,12 +202,14 @@ export default {
             }
         },
         duplicateQuestionLayout(pos) {
-            const qObj = this.questions[pos];
+            const qObj = this.questions[pos]
+            const newObj = JSON.parse(JSON.stringify(qObj)) // prevent for object referencing
             if (pos == this.questionTotalLength()) {
-                this.questions.push(qObj)
+                this.questions.push(newObj)
             } else {
-                this.questions.splice(pos + 1, 0, qObj)
+                this.questions.splice(pos + 1, 0, newObj)
             }
+            console.log(this.questions);
         },
         addNewQuestionLayout(pos) {
             if (pos == this.questionTotalLength()) {
@@ -272,10 +274,7 @@ export default {
 
                 const spfKey = qObj.fsCollection.selectedCollectionSpecificKey
 
-                TODO
-                const collectionName = this.$store.state.collectionRelation[spfKey]['get']['question']['collectionName']
-
-                // console.log(data);
+                const collectionName = spfKey + '_questions'
 
                 this.$store.dispatch('addNewDocument', {
                     dataObj: { ...data },
@@ -295,11 +294,15 @@ export default {
             modal.show()
         },
         createNewChapter() {
-            this.newChapt['details'] = this.newChapt['details'].split('\n')
+            if (this.newChapt['details'] && typeof this.newChapt['details'] === 'string' && this.newChapt['details'].trim() != '') {
+                this.newChapt['details'] = this.newChapt['details'].split('\n')
+            } else {
+                this.newChapt['details'] = []
+            }
+
             const spfKey = this.questions[this.modalAccessId].fsCollection.selectedCollectionSpecificKey
 
-            TODO
-            const collectionName = this.$store.state.collectionRelation[spfKey]['get']['chapter']['collectionName']
+            const collectionName = spfKey + '_overview'
             this.$store.dispatch('addNewDocument', {
                 dataObj: { ...this.newChapt },
                 collectionName: collectionName,
@@ -307,6 +310,11 @@ export default {
                 redirectPath: null
             }).then(() => {
                 modal.hide()
+                // model data reset
+                this.newChapt.chapterCodeId = ''
+                this.newChapt.chapterTitle = ''
+                this.newChapt.chapterSubtitle = ''
+                this.newChapt.details = ''
             })
         }
     },
