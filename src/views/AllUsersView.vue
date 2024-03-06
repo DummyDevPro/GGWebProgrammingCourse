@@ -2,7 +2,7 @@
     <section class="py-5">
         <h4 class="text-center mb-3">全メンバー</h4>
         <div class="px-3">
-            <BaseLayout :data="getAllUsers" layoutType="2" :start="start" :end="end">
+            <BaseLayout :data="getAllUsers" layoutType="2" :start="start" :end="end" @rowClick="moveToUserExamHistory">
                 <template #header>
                     <th scope="col">Email</th>
                     <th scope="col">User Role</th>
@@ -22,10 +22,11 @@
                 <span>
                     Showing <span>{{ currentFilterPageStartNumber }}</span>
                     to {{ currentFilterPage * filterLimit > totalUsers ? totalUsers :
-                        currentFilterPage * filterLimit }}
+                currentFilterPage * filterLimit }}
                     of {{ totalUsers }}
                 </span>
-                <i @click="updateFilterAnswersData('plus')" :class="currentFilterPage == filterCount ? 'd-none' : 'd-block'"
+                <i @click="updateFilterAnswersData('plus')"
+                    :class="currentFilterPage == filterCount ? 'd-none' : 'd-block'"
                     class="bi bi-caret-right right-icon"></i>
             </div>
         </div>
@@ -72,6 +73,9 @@ export default {
             this.end = this.currentFilterPage * this.filterLimit
             this.currentFilterPageStartNumber = this.start + 1
         },
+        moveToUserExamHistory(docId) {
+            console.log(docId);
+        }
     },
     mounted() {
         setTimeout(() => {

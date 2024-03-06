@@ -14,7 +14,8 @@ import {
     addNewDocumentFB,
     updateExistingDocumentFB,
     readSingleDocument,
-    readSingleDocumentByQuery
+    readSingleDocumentByQuery,
+    updateExistingDocumentFieldsFB
 } from '@/firebase/datarw'
 
 import {
@@ -156,6 +157,16 @@ export default {
             (response) => {
                 console.log(response);
             })
+    },
+    updateExistingDocumentFields(context, obj) {
+        updateExistingDocumentFieldsFB(
+            obj.collectionName,
+            obj.docId,
+            obj.data,
+            (response) => {
+                console.log(response);
+            }
+        )
     },
     backOneHistory(context) {
         router.go(-1);

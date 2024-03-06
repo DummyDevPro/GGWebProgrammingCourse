@@ -32,9 +32,10 @@
                     <p>【実行方法】</p>
                     <div class="bg-code-output px-2 py-3">
                         <p class="text-output"
-                            v-for="output in answerDataWrapper['answersData'][currentIndex]['questionCodeCommdaLines']">{{
-                                output
-                            }}</p>
+                            v-for="output in answerDataWrapper['answersData'][currentIndex]['questionCodeCommdaLines']">
+                            {{
+                output
+            }}</p>
                     </div>
                 </div>
 
@@ -48,9 +49,9 @@
                         </div>
                         <div>
                             <label :for="key" :class="answerDataWrapper['answersData'][currentIndex]['userAnswerKeys']?.indexOf(key) != -1 ?
-                                answerDataWrapper['answersData'][currentIndex]['questionAnswerKeys'].indexOf(key) != -1 ?
-                                    'bg-ok' : 'bg-ng' : answerDataWrapper['answersData'][currentIndex]['questionAnswerKeys'].indexOf(key) != -1 ?
-                                    'bg-ans' : ''" class="ps-2 d-block" v-for="ch in formatChoice(choice)">
+                answerDataWrapper['answersData'][currentIndex]['questionAnswerKeys'].indexOf(key) != -1 ?
+                    'bg-ok' : 'bg-ng' : answerDataWrapper['answersData'][currentIndex]['questionAnswerKeys'].indexOf(key) != -1 ?
+                    'bg-ans' : ''" class="ps-2 d-block" v-for="ch in formatChoice(choice)">
                                 {{ ch }}
                             </label>
                         </div>
@@ -66,10 +67,10 @@
                         <div class="d-flex justify-content-between">
                             <div>
                                 Credit the answer :
-                                <span v-if="answerDataWrapper['answersData'][currentIndex].credit == false">
+                                <span v-if="answerDataWrapper['answersData'][currentIndex].result == false">
                                     Uncorrect
                                 </span>
-                                <span v-else-if="answerDataWrapper['answersData'][currentIndex].credit == true">
+                                <span v-else-if="answerDataWrapper['answersData'][currentIndex].result == true">
                                     Correct
                                 </span>
                                 <span v-else>
@@ -103,6 +104,7 @@
         </div>
     </div>
 </template>
+
 <script>
 export default {
     props: ['examId'],
@@ -125,11 +127,25 @@ export default {
             // Remind > Teacher Give Credit
             // Show Flag > Button > Credit登録
             this.markCredit = true;
-            this.answerDataWrapper['answersData'][this.currentIndex].credit = credit
+            this.answerDataWrapper['answersData'][this.currentIndex].result = credit
         },
         updateStudentExamData() {
             console.log(this.answerDataWrapper);
-            // update firestore
+            let totalTrueCount = 0
+            this.answerDataWrapper.answersData.forEach(element => {
+                if (element['result'] != null && element['result']) {
+                    totalTrueCount++
+                }
+            });
+
+            this.$store.dispatch('updateExistingDocumentFields', {
+                data: {
+                    answersData: this.answerDataWrapper.answersData,
+                    totalCorrectCount: totalTrueCount
+                },
+                collectionName: 'user_answers',
+                docId: this.answerDataWrapper.docId
+            })
         },
         backToProfile() {
             this.$store.dispatch('backOneHistory')
@@ -173,6 +189,7 @@ export default {
     }
 }
 </script>
+
 <style scoped>
 .btn-remove {
     display: none;

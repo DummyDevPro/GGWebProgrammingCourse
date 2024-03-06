@@ -12,6 +12,7 @@ import {
     setDoc,
     getDoc,
     addDoc,
+    updateDoc,
     serverTimestamp
 } from "firebase/firestore";
 import router from '@/router';
@@ -142,6 +143,22 @@ async function updateExistingDocumentFB(data, collectionName, docId, callback) {
     }
 }
 
+async function updateExistingDocumentFieldsFB(collectionName, docId, data, callback) {
+    if (!auth.currentUser) {
+        callback({ 'code': 'Access Denined!', 'myStatus': 'error' })
+        return;
+    }
+
+    try {
+        const dataRef = doc(db, collectionName, docId);
+        await updateDoc(dataRef, data);
+        callback({ 'myStatus': 'success' })
+    } catch (error) {
+        console.log(error);
+        callback({ ...error, 'myStatus': 'error' })
+    }
+}
+
 function generateOrderList(data) {
     let list = []
     for (let i = 0; i < data.length; i++) {
@@ -165,5 +182,6 @@ export {
     readSingleDocument,
     addNewDocumentFB,
     updateExistingDocumentFB,
-    readSingleDocumentByQuery
+    readSingleDocumentByQuery,
+    updateExistingDocumentFieldsFB
 }
