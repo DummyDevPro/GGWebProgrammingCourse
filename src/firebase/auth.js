@@ -18,9 +18,12 @@ import { sendMail } from '@/assets/js/util'
 
 const auth = getAuth(app)
 
+
+// url: 'http://localhost:8080',
+const baseUrl = 'https://gaigoweb.onrender.com/'
+
 const actionCodeSettings = {
-    // url: 'http://localhost:8080',
-    url: 'https://gaigoweb.onrender.com/',
+    url: baseUrl,
     handleCodeInApp: false,
 }
 
@@ -59,7 +62,9 @@ async function handleCreateUserWithEmailAndPassword(email, password, callback) {
 function handleSendEmailVerification(user, email, callback) {
     // send verification url 
     let acs = actionCodeSettings
-    acs.url += `home?email=${email}`
+
+    // Set > Redirect URL
+    acs.url = `${baseUrl}home?email=${email}`
 
     sendEmailVerification(user, acs)
         .then(() => {
