@@ -133,6 +133,7 @@ const routes = [
     path: '/user/exam/history',
     name: 'user-exam-history',
     component: ExamHistoryViewVue,
+    props: route => ({ userId: route.query.userId }),
     meta: {
       requiresAuth: true
     }

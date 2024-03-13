@@ -2,7 +2,8 @@
     <section class="py-5">
         <h4 class="text-center mb-3">全メンバー</h4>
         <div class="px-3">
-            <BaseLayout :data="getAllUsers" layoutType="2" :start="start" :end="end" @rowClick="moveToUserExamHistory">
+            <BaseLayout :data="getAllUsers" layoutType="2" :start="start" :end="end"
+                @rowClickByAdmin="moveToUserExamHistory">
                 <template #header>
                     <th scope="col">Email</th>
                     <th scope="col">User Role</th>
@@ -35,6 +36,7 @@
 
 <script>
 import { convertTimeStampToDate } from '@/assets/js/dateUtils.js'
+import router from '@/router'
 import BaseLayout from '@/views/BaseLayout.vue'
 export default {
     components: { BaseLayout },
@@ -73,8 +75,13 @@ export default {
             this.end = this.currentFilterPage * this.filterLimit
             this.currentFilterPageStartNumber = this.start + 1
         },
-        moveToUserExamHistory(docId) {
-            console.log(docId);
+        moveToUserExamHistory(uid) {
+            router.push({
+                name: 'user-exam-history',
+                query: {
+                    userId: uid
+                }
+            })
         }
     },
     mounted() {
@@ -96,4 +103,21 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.left-icon,
+.right-icon {
+    color: white;
+    height: fit-content;
+    width: fit-content;
+    background-color: var(--color-g-web);
+    padding: .25rem .5rem;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all .3s linear;
+}
+
+.left-icon:hover,
+.right-icon:hover {
+    box-shadow: 2px 0 4px black;
+}
+</style>

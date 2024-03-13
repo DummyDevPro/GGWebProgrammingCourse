@@ -44,7 +44,7 @@
                 </thead>
 
                 <tbody>
-                    <tr v-for="(item, index) in data.slice(start, end)" @click="rowClickComp(item.docId)"
+                    <tr v-for="(item, index) in data.slice(start, end)" @click="rowClickComp(item)"
                         style="cursor: pointer;">
                         <th scope="row">{{ start + index + 1 }}</th>
                         <slot name="body" v-bind="item" />
@@ -55,6 +55,7 @@
         </div>
     </div>
 </template>
+
 <script>
 var dotsInterval;
 var isIncrease = true;
@@ -71,8 +72,9 @@ export default {
         },
 
         // For ExamHistoryView
-        rowClickComp(docId) {
-            this.$emit('rowClick', docId)
+        rowClickComp(item) {
+            this.$emit('rowClick', item.docId)
+            this.$emit('rowClickByAdmin', item.uid)
         }
     },
     mounted() {

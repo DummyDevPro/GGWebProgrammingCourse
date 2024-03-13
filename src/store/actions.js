@@ -15,7 +15,8 @@ import {
     updateExistingDocumentFB,
     readSingleDocument,
     readSingleDocumentByQuery,
-    updateExistingDocumentFieldsFB
+    updateExistingDocumentFieldsFB,
+    updateUserCollection
 } from '@/firebase/datarw'
 
 import {
@@ -39,9 +40,15 @@ export default {
                     readSingleDocumentByQuery(
                         'users',
                         true,
+                        true,
                         [{ key: 'emailAddress', opt: '==', value: email }],
                         (userDataResponse) => {
                             if (userDataResponse.myStatus == 'success') {
+                                // if user_id doesn't exist add user_id
+                                if (!userDataResponse.uid) {
+                                    updateUserCollection(userDataResponse.data.docId, (_) => { })
+                                }
+
                                 delete userDataResponse.myStatus
                                 let userInfo = {
                                     ...userDataResponse.data,
@@ -75,32 +82,54 @@ export default {
         context.commit('updateLogoutModalState')
     },
     getCollectionData(context, obj) {
-        if (obj.docId) {
-            readSingleDocument(
-                obj.collectionName,
-                obj.docId,
-                ((response) => {
-                    if (response.myStatus == 'error') {
-                        // context.commit('alertMsg', { ...response, })
-                    } else {
-                        if (response.data?.length == 0 && obj.init) {
-                            // from profile page(need initialization) 
-                            updateExistingDocumentFB(
-                                {
-                                    email: context.state.userInfo.emailAddress
-                                },
-                                'users_profile',
-                                obj.docId,
-                                (response) => {
-                                    context.commit('getCollectionDataState',
-                                        {
-                                            response: response.data,
-                                            groupName: obj.groupName,
-                                            saveCollectionName: obj.saveCollectionName
-                                        })
-                                })
+
+        return new Promise((resolve, __) => {
+            if (obj.docId) {
+                readSingleDocument(
+                    obj.collectionName,
+                    obj.docId,
+                    ((response) => {
+                        if (response.myStatus == 'error') {
+                            // context.commit('alertMsg', { ...response, })
+                        } else {
+                            if (response.data?.length == 0 && obj.init) {
+                                // from profile page(need initialization) 
+                                updateExistingDocumentFB(
+                                    {
+                                        email: context.state.userInfo.emailAddress
+                                    },
+                                    'users_profile',
+                                    obj.docId,
+                                    (response) => {
+                                        context.commit('getCollectionDataState',
+                                            {
+                                                response: response.data,
+                                                groupName: obj.groupName,
+                                                saveCollectionName: obj.saveCollectionName
+                                            })
+                                    })
+                            }
+                            else {
+                                context.commit('getCollectionDataState',
+                                    {
+                                        response: response.data,
+                                        groupName: obj.groupName,
+                                        saveCollectionName: obj.saveCollectionName
+                                    })
+                            }
+                            resolve()
                         }
-                        else {
+                    })
+                )
+            } else {
+                readCollectionFB(
+                    obj.collectionName
+                    , obj.wheres
+                    , obj.orders
+                    , (response) => {
+                        if (response.myStatus == 'error') {
+                            // context.commit('alertMsg', { ...response, })
+                        } else {
                             context.commit('getCollectionDataState',
                                 {
                                     response: response.data,
@@ -108,27 +137,10 @@ export default {
                                     saveCollectionName: obj.saveCollectionName
                                 })
                         }
-                    }
-                })
-            )
-        } else {
-            readCollectionFB(
-                obj.collectionName
-                , obj.wheres
-                , obj.orders
-                , (response) => {
-                    if (response.myStatus == 'error') {
-                        // context.commit('alertMsg', { ...response, })
-                    } else {
-                        context.commit('getCollectionDataState',
-                            {
-                                response: response.data,
-                                groupName: obj.groupName,
-                                saveCollectionName: obj.saveCollectionName
-                            })
-                    }
-                })
-        }
+                        resolve()
+                    })
+            }
+        })
     },
     addNewDocument(context, obj) {
         console.log(obj);
@@ -201,6 +213,7 @@ export default {
             // check user account exists or not by using email
             readSingleDocumentByQuery(
                 'users',
+                false,
                 false,
                 [{ key: 'emailAddress', opt: '==', value: email }],
                 (response) => {

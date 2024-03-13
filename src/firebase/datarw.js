@@ -32,12 +32,17 @@ async function readSingleDocument(collectionName, docId, callback) {
         const docSnap = await getDoc(docRef);
         callback({ 'data': docSnap.exists() ? docSnap.data() : [], 'myStatus': 'success' })
     } catch (error) {
-        console.log(error);
+        console.error(error);
         callback({ ...error, 'myStatus': 'error' })
     }
 }
 
-async function readSingleDocumentByQuery(collectionName, backUserData, condition, callback) {
+async function readSingleDocumentByQuery(collectionName, requiresAuth, backUserData, condition, callback) {
+    if (!auth.currentUser && requiresAuth) {
+        callback({ 'code': 'Access Denined!', 'myStatus': 'error' })
+        return;
+    }
+
     try {
         let userData = {};
         let whereList = generateWhereList(condition)
@@ -45,7 +50,7 @@ async function readSingleDocumentByQuery(collectionName, backUserData, condition
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach((doc) => {
             if (doc.data()?.emailAddress) {
-                userData = doc.data()
+                userData = { ...doc.data(), docId: doc.id }
                 return;
             }
         });
@@ -60,7 +65,7 @@ async function readSingleDocumentByQuery(collectionName, backUserData, condition
             callback({ 'myStatus': 'error', 'extraMsg': 'このメールで登録したアカウントがありません。' })
         }
     } catch (error) {
-        console.log(error);
+        console.error(error);
         callback({ ...error, 'myStatus': 'error' })
     }
 }
@@ -76,7 +81,7 @@ async function addNewDocumentByCustomDocId(collectionName, docId, data, callback
         await setDoc(docRef, data, { merge: true })
         callback({ 'myStatus': 'success' })
     } catch (error) {
-        console.log(error);
+        console.error(error);
         callback({ ...error, 'myStatus': 'error' })
     }
 }
@@ -100,7 +105,7 @@ async function readCollectionFB(collectionName, condition, order, callback) {
 
         callback({ 'data': responseArr, 'myStatus': 'success' })
     } catch (error) {
-        console.log(error);
+        console.error(error);
         callback({ ...error, 'myStatus': 'error' })
     }
 }
@@ -124,7 +129,26 @@ async function addNewDocumentFB(data, callback) {
 
         callback({ 'data': docRef.id, 'myStatus': 'success' })
     } catch (error) {
-        console.log(error);
+        console.error(error);
+        callback({ ...error, 'myStatus': 'error' })
+    }
+}
+
+async function updateUserCollection(docId, callback) {
+    if (!auth.currentUser) {
+        callback({ 'code': 'Access Denined!', 'myStatus': 'error' })
+        return;
+    }
+
+    try {
+        await updateExistingDocumentFB(
+            { uid: auth.currentUser.uid },
+            'users',
+            docId,
+            callback
+        )
+    } catch (error) {
+        console.error(error);
         callback({ ...error, 'myStatus': 'error' })
     }
 }
@@ -138,7 +162,7 @@ async function updateExistingDocumentFB(data, collectionName, docId, callback) {
     try {
         await addNewDocumentByCustomDocId(collectionName, docId, data, callback)
     } catch (error) {
-        console.log(error);
+        console.error(error);
         callback({ ...error, 'myStatus': 'error' })
     }
 }
@@ -154,7 +178,7 @@ async function updateExistingDocumentFieldsFB(collectionName, docId, data, callb
         await updateDoc(dataRef, data);
         callback({ 'myStatus': 'success' })
     } catch (error) {
-        console.log(error);
+        console.error(error);
         callback({ ...error, 'myStatus': 'error' })
     }
 }
@@ -183,5 +207,6 @@ export {
     addNewDocumentFB,
     updateExistingDocumentFB,
     readSingleDocumentByQuery,
-    updateExistingDocumentFieldsFB
+    updateExistingDocumentFieldsFB,
+    updateUserCollection
 }

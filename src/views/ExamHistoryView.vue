@@ -28,20 +28,23 @@
                 <span>
                     Showing <span>{{ currentFilterPageStartNumber }}</span>
                     to {{ currentFilterPage * filterLimit > totalAnswersDataCount ? totalAnswersDataCount :
-                        currentFilterPage * filterLimit }}
+                currentFilterPage * filterLimit }}
                     of {{ totalAnswersDataCount }}
                 </span>
-                <i @click="updateFilterAnswersData('plus')" :class="currentFilterPage == filterCount ? 'd-none' : 'd-block'"
+                <i @click="updateFilterAnswersData('plus')"
+                    :class="currentFilterPage == filterCount ? 'd-none' : 'd-block'"
                     class="bi bi-caret-right right-icon"></i>
 
             </div>
         </div>
     </section>
 </template>
+
 <script>
 import { convertTimeStampToDate, convertTimeStampToTime } from '@/assets/js/dateUtils.js'
 import BaseLayout from '@/views/BaseLayout.vue'
 export default {
+    props: ['userId'],
     components: { BaseLayout },
     data() {
         return {
@@ -94,7 +97,8 @@ export default {
             this.$store.dispatch('getCollectionData', {
                 collectionName: 'user_answers',
                 wheres: [
-                    { key: 'uid', opt: '==', value: this.$store.getters.acquireUserInfo.uid }
+                    // uid passes from request parameter <or> gets from state(login user id)
+                    { key: 'uid', opt: '==', value: this.userId ?? this.$store.getters.acquireUserInfo.uid }
                 ],
                 orders: [
                     {
@@ -109,6 +113,7 @@ export default {
     }
 }
 </script>
+
 <style scoped>
 .exam-result-layout table tbody tr {
     cursor: pointer;
