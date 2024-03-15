@@ -1,7 +1,7 @@
 <template>
     <div class="wrapper">
         <div v-if="getChapterInfo" class="bg-dark text-white px-3 d-flex align-items-center"
-            style="position: sticky;top:72px;">
+            style="position: sticky;top:72px;z-index: 5;">
             <span class="fs-5">{{ getChapterInfo['chapterTitle'] }}</span>
             <span class="fs-5 text-warning"><i class="bi bi-chevron-compact-right"></i></span>
             <span class="small">{{ getChapterInfo['chapterSubtitle'] }}</span>
@@ -50,7 +50,7 @@
                     <p>【表示結果】</p>
                     <div class="bg-code-output px-2 py-3">
                         <p class="m-0" v-for="output in questionsList[currentIndex]['questionCodeOutput']">{{ output
-                        }}
+                            }}
                         </p>
                     </div>
                 </div>
@@ -60,7 +60,7 @@
                     <p>【実行方法】</p>
                     <div class="bg-dark text-white  px-2 py-3">
                         <p class="m-0" v-for="output in questionsList[currentIndex]['questionCodeCommdaLines']">{{
-                            output }}
+            output }}
                         </p>
                     </div>
                 </div>
@@ -71,16 +71,28 @@
                         v-for="choice, key in questionsList[currentIndex]['questionMultiChoices']">
                         <div>
                             <input type="checkbox" :value="key" v-model="selectedItems" :id="key" :disabled="selectedItems.length == questionsList[currentIndex]['numOfQuestionAnswers']
-                                && selectedItems.indexOf(key) == -1" @click="userTakeAction">
+            && selectedItems.indexOf(key) == -1" @click="userTakeAction">
                         </div>
                         <div>
                             <label :for="key" class="ps-2 d-block" v-for="ch in formatChoice(choice)">{{ ch }}</label>
                         </div>
                     </div>
-                    <div v-else>
-                        <label for="javaCode" class="mb-2">Main.java</label>
-                        <textarea id="javaCode" class="form-control" rows="10" placeholder="place java code"
-                            v-model="questionsList[currentIndex]['userAnswerSourceCode']"></textarea>
+                    <div v-else class="d-flex flex-column gap-2">
+                        <div class="position-relative"
+                            v-for="(_, index) in questionsList[currentIndex]['userAnswerSourceCode']">
+                            <div class="position-absolute d-flex flex-column gap-1"
+                                style="top: .25rem;right: .25rem;z-index: 1;">
+                                <button v-if="index != 0" class="btn btn-danger" @click="removeCodeLayout(index)">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                                <button class="btn btn-success" @click="addCodeLayout(index)">
+                                    <i class="bi bi-plus-lg"></i>
+                                </button>
+                            </div>
+                            <textarea :id="'javaCode' + index" class="form-control" rows="10"
+                                placeholder="place java code"
+                                v-model="questionsList[currentIndex]['userAnswerSourceCode'][index]"></textarea>
+                        </div>
                     </div>
                 </div>
 
@@ -126,6 +138,12 @@ export default {
         }
     },
     methods: {
+        removeCodeLayout(pos) {
+            this.questionsList[this.currentIndex]['userAnswerSourceCode'].splice(pos, 1)
+        },
+        addCodeLayout(pos) {
+            this.questionsList[this.currentIndex]['userAnswerSourceCode'].splice(pos + 1, 0, '')
+        },
         recordStartDate() {
             if (!this.startDateTime) {
                 this.startDateTime = Date.now()
@@ -155,7 +173,7 @@ export default {
             } else {
                 if (!this.questionsList[this.currentIndex]['questionMultiChoices']) {
                     if (!this.questionsList[this.currentIndex]['userAnswerSourceCode']) {
-                        this.questionsList[this.currentIndex]['userAnswerSourceCode'] = ''
+                        this.questionsList[this.currentIndex]['userAnswerSourceCode'] = ['']
                     }
                 }
                 this.selectedItems = []
@@ -272,13 +290,6 @@ export default {
         }
     },
     mounted() {
-
-        // TODO load subject type for current chapter 
-
-        // console.log(this.specific);
-        // console.log(this.$store.getters.acquireAllQuestionsNameData('selectedQuestion'));
-        // console.log(this.chapter);
-
         setTimeout(() => {
             this.$store.dispatch('getCollectionData', {
                 collectionName: 'all_questions_collection',
@@ -300,7 +311,7 @@ export default {
                     if (this.questionsList[0]['questionMultiChoices']) {
                         this.questionsList[0]['userAnswerKeys'] = []
                     } else {
-                        this.questionsList[0]['userAnswerSourceCode'] = ''
+                        this.questionsList[0]['userAnswerSourceCode'] = ['']
                     }
                 }
             }

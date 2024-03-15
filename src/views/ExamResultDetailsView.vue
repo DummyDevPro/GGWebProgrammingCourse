@@ -59,22 +59,23 @@
 
                     <!-- userAnswerSourceCode -->
                     <div v-if="answerDataWrapper['answersData'][currentIndex]['userAnswerSourceCode']">
-                        <div class="mb-3">
-                            <textarea v-model="answerDataWrapper['answersData'][currentIndex]['userAnswerSourceCode']"
-                                class="form-control" rows="10" disabled></textarea>
+                        <div class="mb-3 d-flex flex-column gap-2">
+                            <textarea
+                                v-for="code in answerDataWrapper['answersData'][currentIndex]['userAnswerSourceCode']"
+                                v-bind:value="code" class="form-control" rows="10" disabled></textarea>
                         </div>
 
                         <div class="d-flex justify-content-between">
                             <div>
                                 Credit the answer :
                                 <span v-if="answerDataWrapper['answersData'][currentIndex].result == false">
-                                    Uncorrect
+                                    ✕
                                 </span>
                                 <span v-else-if="answerDataWrapper['answersData'][currentIndex].result == true">
-                                    Correct
+                                    〇
                                 </span>
                                 <span v-else>
-                                    Unchecked
+                                    &quest;
                                 </span>
                             </div>
 
