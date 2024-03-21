@@ -171,14 +171,17 @@ export default {
             })
     },
     updateExistingDocumentFields(context, obj) {
-        updateExistingDocumentFieldsFB(
-            obj.collectionName,
-            obj.docId,
-            obj.data,
-            (response) => {
-                console.log(response);
-            }
-        )
+        return new Promise((resolve, reject) => {
+            updateExistingDocumentFieldsFB(
+                obj.collectionName,
+                obj.docId,
+                obj.data,
+                (response) => {
+                    console.log(response);
+                    resolve()
+                }
+            )
+        })
     },
     backOneHistory(context) {
         router.go(-1);

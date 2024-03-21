@@ -38,14 +38,46 @@
                     <span class="q-text">{{ questionsList[currentIndex]['questionTitle'] }}</span>
                 </div>
 
-                <!-- Java Source Code部分 -->
+                <!-- Hint -->
+                <div v-if="questionsList[currentIndex]['questionHint']" class="px-4 py-2 mb-3 d-flex gap-2 flex-column">
+                    <span class="fw-bold">Keywords for you</span>
+                    <span class="d-flex gap-1">
+                        <span v-for="hint in questionsList[currentIndex]['questionHint']"
+                            class="bg-warning py-1 px-3 rounded">
+                            {{ hint }}
+                        </span>
+                    </span>
+                </div>
+
+                <!-- Source Code部分 -->
                 <div v-if="questionsList[currentIndex]['questionCode']" class="question-code p-2">
                     <pre v-for="qCode in questionsList[currentIndex]['questionCode']"
                         class="code-layout ps-3"><code><ol><li v-for="(line, index) in formattingJavaCode(qCode)">{{ line.textContent }}</li></ol></code></pre>
                     <!-- <span v-for="(line, index) in formattingJavaCode(qCode)"><span class="d-flex"><span class="pe-3 prevent-select" style="flex: 0 0 3.5rem;text-align: right;">{{ index + 1 + '.' }}</span><span style="display: inline-block;">{{ line.textContent }}</span></span></span> -->
                 </div>
 
-                <!-- Java Source Codeの実行結果部分 -->
+                <!-- Table Data -->
+                <div v-if="questionsList[currentIndex]['questionTableData']"
+                    v-for="tData in questionsList[currentIndex]['questionTableData']" class="px-4">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th v-for="h in tData['heading']">
+                                    {{ h }}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="bArr in tData['body']">
+                                <td v-for="b in bArr">
+                                    {{ b }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Source Codeの実行結果部分 -->
                 <div class="question-code-output p-2 mb-3" v-if="questionsList[currentIndex]['questionCodeOutput']">
                     <p>【表示結果】</p>
                     <div class="bg-code-output px-2 py-3">
@@ -55,7 +87,7 @@
                     </div>
                 </div>
 
-                <!-- Java Source Codeの実行方法部分 -->
+                <!-- Source Codeの実行方法部分 -->
                 <div class="question-code-run p-2 mb-3" v-if="questionsList[currentIndex]['questionCodeCommdaLines']">
                     <p>【実行方法】</p>
                     <div class="bg-dark text-white  px-2 py-3">

@@ -6,16 +6,52 @@
         <div class="exam-result-detail col-11 col-sm-11 col-md-11 col-md-9 col-lg-7">
             <div v-if="answerDataWrapper && answerDataWrapper['answersData'].length > 0"
                 class="question-item overflow-auto">
+                <!-- 題名部分 -->
                 <div class="question-title d-flex mb-3 p-2">
                     <span class="q-no">{{ `(${currentIndex + 1})` }}</span>
                     <span class="q-text">{{ answerDataWrapper['answersData'][currentIndex]['questionTitle'] }}</span>
                 </div>
 
+                <!-- Hint -->
+                <div v-if="answerDataWrapper['answersData'][currentIndex]['questionHint']"
+                    class="px-4 py-2 mb-3 d-flex gap-2 flex-column">
+                    <span class="fw-bold">Keywords for you</span>
+                    <span class="d-flex gap-1">
+                        <span v-for="hint in answerDataWrapper['answersData'][currentIndex]['questionHint']"
+                            class="bg-warning py-1 px-3 rounded">
+                            {{ hint }}
+                        </span>
+                    </span>
+                </div>
+
+                <!-- Source Code部分 -->
                 <div v-if="answerDataWrapper['answersData'][currentIndex]['questionCode']" class="question-code p-2">
                     <pre v-for="qCode in answerDataWrapper['answersData'][currentIndex]['questionCode']"
                         class="code-layout ps-3"><code><ol><li v-for="(line, index) in formattingJavaCode(qCode)">{{ line.textContent }}</li></ol></code></pre>
                 </div>
 
+                <!-- Table Data -->
+                <div v-if="answerDataWrapper['answersData'][currentIndex]['questionTableData']"
+                    v-for="tData in answerDataWrapper['answersData'][currentIndex]['questionTableData']" class="px-4">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th v-for="h in tData['heading']">
+                                    {{ h }}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="bArr in tData['body']">
+                                <td v-for="b in bArr">
+                                    {{ b }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Source Codeの実行結果部分 -->
                 <div class="question-code-output p-2 mb-3"
                     v-if="answerDataWrapper['answersData'][currentIndex]['questionCodeOutput']">
                     <p>【表示結果】</p>
@@ -27,6 +63,7 @@
                     </div>
                 </div>
 
+                <!-- Source Codeの実行方法部分 -->
                 <div class="question-code-run p-2 mb-3"
                     v-if="answerDataWrapper['answersData'][currentIndex]['questionCodeCommdaLines']">
                     <p>【実行方法】</p>
@@ -139,14 +176,18 @@ export default {
                 }
             });
 
-            this.$store.dispatch('updateExistingDocumentFields', {
-                data: {
-                    answersData: this.answerDataWrapper.answersData,
-                    totalCorrectCount: totalTrueCount
-                },
-                collectionName: 'user_answers',
-                docId: this.answerDataWrapper.docId
-            })
+            this.$store
+                .dispatch('updateExistingDocumentFields', {
+                    data: {
+                        answersData: this.answerDataWrapper.answersData,
+                        totalCorrectCount: totalTrueCount
+                    },
+                    collectionName: 'user_answers',
+                    docId: this.answerDataWrapper.docId
+                })
+                .then(() => {
+                    this.$store.dispatch('backOneHistory')
+                })
         },
         backToProfile() {
             this.$store.dispatch('backOneHistory')

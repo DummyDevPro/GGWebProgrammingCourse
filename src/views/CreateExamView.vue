@@ -22,7 +22,8 @@
                                             @click.prevent="addSubLayout(idx, 'code')">Code</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="#"
+                                        <a :class="questions[idx].items.findIndex((item) => item.type == 'hint') != -1 ? 'disabled' : ''"
+                                            class="dropdown-item" href="#"
                                             @click.prevent="addSubLayout(idx, 'hint')">Hint</a>
                                     </li>
                                     <li>
@@ -30,8 +31,9 @@
                                             @click.prevent="addSubLayout(idx, 'table')">Table</a>
                                     </li>
                                     <li>
-                                        <a :class="questions[idx].choice == null ? '' : 'disabled'" class="dropdown-item"
-                                            href="#" @click.prevent="addMultipleChoiceLayout(idx)">Choices</a>
+                                        <a :class="questions[idx].choice == null ? '' : 'disabled'"
+                                            class="dropdown-item" href="#"
+                                            @click.prevent="addMultipleChoiceLayout(idx)">Choices</a>
                                     </li>
                                 </ul>
                             </div>
@@ -62,8 +64,9 @@
                                 <!-- item -->
                                 <div class="position-relative" v-for="(item, iidx) in questions[idx].items" :key="iidx">
 
-                                    <button type="button" class="btn-close bg-danger position-absolute" aria-label="Close"
-                                        style="top: .25rem;right: .25rem;" @click="removeSubLayout(idx, iidx)"></button>
+                                    <button type="button" class="btn-close bg-danger position-absolute"
+                                        aria-label="Close" style="top: .25rem;right: .25rem;"
+                                        @click="removeSubLayout(idx, iidx)"></button>
 
                                     <div v-if="item.type == 'code'">
                                         <code-layout v-model:content="questions[idx].items[iidx].data" />
@@ -86,11 +89,20 @@
                             <!-- Multiple Choice Layout -->
                             <div class="position-relative" v-if="questions[idx].choice != null">
                                 <button type="button" class="btn-close bg-danger position-absolute" aria-label="Close"
-                                    style="top: .25rem;right: .25rem;" @click="removeMultipleChoiceLayout(idx)"></button>
+                                    style="top: .25rem;right: .25rem;"
+                                    @click="removeMultipleChoiceLayout(idx)"></button>
 
                                 <multiple-choice-layout v-model:choice="questions[idx].choice"></multiple-choice-layout>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="submitCheck" v-model="checkRequire"
+                            required>
+                        <label class="form-check-label" for="submitCheck">
+                            Confirmation for question creation
+                        </label>
                     </div>
 
                     <div>
@@ -111,8 +123,8 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="chapterCodeId" class="form-label">Chapter Code Id</label>
-                            <input v-model="newChapt['chapterCodeId']" type="text" class="form-control" id="chapterCodeId"
-                                placeholder="j-bz-chapter-1,j-b-chapter-2,..." required>
+                            <input v-model="newChapt['chapterCodeId']" type="text" class="form-control"
+                                id="chapterCodeId" placeholder="j-bz-chapter-1,j-b-chapter-2,..." required>
                         </div>
                         <div class="mb-3">
                             <label for="chapterTitle" class="form-label">Chapter Title</label>
@@ -167,7 +179,7 @@ export default {
                     },
                     title: '',
                     items: [],
-                    choice: null
+                    choice: null,
                 }
             ],
             newChapt: {
@@ -176,7 +188,8 @@ export default {
                 'chapterSubtitle': '',
                 'details': '',
             },
-            modalAccessId: null
+            modalAccessId: null,
+            checkRequire: false
         }
     },
     methods: {
@@ -237,6 +250,7 @@ export default {
 
         // Firebase Communication Methods
         showResult() {
+            this.checkRequire = false;
             // console.log(this.questions);
             // return;
             for (let i = 0; i < this.questions.length; i++) {
@@ -267,6 +281,42 @@ export default {
                                 data['questionCode'] = []
                             data['questionCode'].push(element.data)
                         }
+
+                        if (element.type == 'hint') {
+                            if (!data['questionHint'])
+                                data['questionHint'] = {}
+                            // data['questionHint'].push(element.data)
+                            for (let i = 0; i < element.data.length; i++) {
+                                data['questionHint'][i] = element.data[i]
+                            }
+                        }
+
+                        // Question meta data(table information)
+                        if (element.type == 'table') {
+                            if (!data['questionTableData'])
+                                data['questionTableData'] = []
+                            // data['questionTableData'].push({ ...element.data })
+                            // heading
+                            let heading = {
+                                // heading: element.data.heading
+                            }
+                            for (let i = 0; i < element.data.heading.length; i++) {
+                                heading[i] = element.data.heading[i]
+                            }
+                            // body
+                            let body = {
+                                // heading: element.data.body
+                            }
+                            for (let i = 0; i < element.data.body.length; i++) {
+                                body[i] = element.data.body[i]
+                            }
+                            data['questionTableData'].push(
+                                {
+                                    heading: heading,
+                                    body: body
+                                }
+                            )
+                        }
                     }
                 }
 
@@ -275,6 +325,9 @@ export default {
                 const spfKey = qObj.fsCollection.selectedCollectionSpecificKey
 
                 const collectionName = spfKey + '_questions'
+
+                // console.log(data);
+                // return;
 
                 this.$store.dispatch('addNewDocument', {
                     dataObj: { ...data },
