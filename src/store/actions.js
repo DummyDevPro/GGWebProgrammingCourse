@@ -291,7 +291,6 @@ export default {
         })
     },
     registerStudentProject(context, data) {
-        console.log(data);
         // update firebase storage/images
         return new Promise((resolve, __) => {
             handleFileUpload(
@@ -311,6 +310,36 @@ export default {
                                     projectImageUrl: response.fileUrl
                                 },
                                 collectionName: 'student_projects',
+                                requireUserInfo: true
+                            },
+                            (__) => {
+                                resolve()
+                            })
+                    }
+                })
+        })
+    },
+    registerNewCategory(context, data) {
+        // update firebase storage/images
+        return new Promise((resolve, __) => {
+            handleFileUpload(
+                data.photo,
+                'image',
+                'all_questions',
+                false,
+                (response) => {
+                    if (response.myStatus === 'success') {
+                        // save to firebase/firestore (collection : all_questions_collection)
+                        addNewDocumentFB(
+                            {
+                                dataObj: {
+                                    title: data.title,
+                                    subTitle: data.subTitle,
+                                    specific: data.specific,
+                                    photo: response.fileUrl,
+                                    type: data.type
+                                },
+                                collectionName: 'all_questions_collection',
                                 requireUserInfo: true
                             },
                             (__) => {

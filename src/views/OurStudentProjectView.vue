@@ -18,22 +18,23 @@
                 </div>
             </template>
         </BaseLayout>
-        <div v-if="getUserRole && getUserRole == 99" class="text-center">
-            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#myModal">
-                Add New Project <i class="bi bi-plus fs-6"></i>
-            </button>
-        </div>
+    </div>
+
+    <div v-if="getUserRole && getUserRole == 99" class="position-sticky p-3 style-float bg-dark text-center rounded">
+        <button class="btn btn-success" @click="showModal">
+            Add New Project <i class="bi bi-plus fs-6"></i>
+        </button>
     </div>
 
     <!-- The Modal -->
-    <div class="modal fade" id="myModal">
+    <div class="modal fade" id="myModal" ref="myModal">
         <div class="modal-dialog">
             <div class="modal-content">
 
                 <!-- Modal Header -->
                 <div class="modal-header">
                     <h4 class="modal-title">Add New Student Project</h4>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" @click="hideModal"></button>
                 </div>
 
                 <!-- Modal body -->
@@ -41,19 +42,23 @@
                     <form @submit.prevent="registerStudentProject" ref="registerProjectForm">
                         <div class="mb-3">
                             <label for="projectTitle" class="form-label">Project Title</label>
-                            <input type="text" id="projectTitle" class="form-control" v-model="project.projectTitle">
+                            <input type="text" id="projectTitle" class="form-control" v-model="project.projectTitle"
+                                required>
                         </div>
                         <div class="mb-3">
                             <label for="projectOwner" class="form-label">Developer Name</label>
-                            <input type="text" id="projectOwner" class="form-control" v-model="project.projectOwner">
+                            <input type="text" id="projectOwner" class="form-control" v-model="project.projectOwner"
+                                required>
                         </div>
                         <div class="mb-3">
                             <label for="projectImage" class="form-label">Project Demo Image</label>
-                            <input type="file" id="projectImage" class="form-control" accept="image/*" @change="selectFile">
+                            <input type="file" id="projectImage" class="form-control" accept="image/*"
+                                @change="selectFile" required>
                         </div>
                         <div class="mb-3">
                             <label for="projectUrl" class="form-label">Project URL</label>
-                            <input type="text" id="projectUrl" class="form-control" v-model="project.projectUrl">
+                            <input type="text" id="projectUrl" class="form-control" v-model="project.projectUrl"
+                                required>
                         </div>
 
                         <div class="d-flex">
@@ -71,6 +76,7 @@
 <script>
 import BaseLayout from "@/views/BaseLayout.vue"
 
+let modal;
 export default {
     components: { BaseLayout },
     data() {
@@ -85,6 +91,18 @@ export default {
         }
     },
     methods: {
+        showModal() {
+            if (modal == undefined || modal == null) {
+                modal = new bootstrap.Modal(this.$refs.myModal, {})
+                modal.show()
+            }
+        },
+        hideModal() {
+            if (modal != null) {
+                modal.hide()
+                modal = null
+            }
+        },
         selectFile(event) {
             if (event.target.files && event.target.files[0]) {
                 // Image file read & write
@@ -105,7 +123,8 @@ export default {
 
             if (!emptyCheck) {
                 this.btnDisable = true
-                this.$store.dispatch('registerStudentProject', this.project)
+                this.$store
+                    .dispatch('registerStudentProject', this.project)
                     .then(() => {
                         this.$store.dispatch('getCollectionData', {
                             collectionName: 'student_projects',
@@ -126,6 +145,7 @@ export default {
                             this.project[key] = null
                         })
                         this.btnDisable = false
+                        this.hideModal()
                     })
             }
         }
@@ -174,5 +194,13 @@ export default {
 
     object-fit: cover;
     object-position: top center;
+}
+
+.style-float {
+    right: 0;
+    bottom: 0;
+    z-index: 88;
+    width: max-content;
+    margin: 0 auto;
 }
 </style>
