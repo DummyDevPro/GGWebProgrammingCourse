@@ -6,12 +6,14 @@
                 @rowClickByAdmin="moveToUserExamHistory">
                 <template #header>
                     <th scope="col">Email</th>
+                    <th scope="col">User Name</th>
                     <th scope="col">User Role</th>
                     <th scope="col">Created Date</th>
                 </template>
 
-                <template #body="{ emailAddress, userRole, createdTimestamp }">
+                <template #body="{ emailAddress, userRole, createdTimestamp, userName }">
                     <td>{{ emailAddress }}</td>
+                    <td>{{ userName ?? 'Default' }}</td>
                     <td>{{ userRole ? 'Admin' : 'User' }}</td>
                     <td>{{ convertDate(createdTimestamp) }}</td>
                 </template>

@@ -1,217 +1,121 @@
 <template>
-    <div class="profile-layout">
-        <div class="profile-image">
-            <div class="profile-image-preview" :style="{
-                'background-color': 'gray',
-                'background-image': previewImg == null ? `url(${require('../assets/img/person-default.png')})` : `url(${previewImg})`,
-                'background-position': 'center',
-                'background-size': 'cover',
-                'background-repeat': 'no-repeat'
-            }">
-                <img @click="handleSelectFile" src="../assets/img/camera-fill.svg" alt="" class="btn-camera-img">
+    <div>
+        <div v-if="!getUserBasicInformation" class="m-auto py-5" style="width: max-content;">
+            <div>
+                <h3>Loading</h3>
             </div>
-            <div class="image-choose-upload">
-                <input type="file" @change="selectFile" accept="image/*" ref="fileInput" hidden>
-                <input type="button" class="btn btn-success" value="保存" @click="uploadProfileImage"
-                    :disabled="!selectedFile">
+            <div class="d-flex gap-1">
+                <span v-for="dot in dots" class="p-1 bg-primary">
+                    {{ dot }}
+                </span>
             </div>
         </div>
 
-        <!-- <hr> -->
-
-        <nav class="bg-white">
-            <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                <div class="d-none d-sm-block col-sm-2"></div>
-                <button class="nav-link active" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile"
-                    type="button" role="tab" aria-controls="nav-profile" aria-selected="true">
-                    Profile
-                </button>
-                <button @click="loadAllImagesBtnClick" class="nav-link" id="nav-gallery-tab" data-bs-toggle="tab"
-                    data-bs-target="#nav-gallery" type="button" role="tab" aria-controls="nav-gallery"
-                    aria-selected="false">
-                    Gallery
-                </button>
-                <!-- <button class="nav-link" id="nav-friend-tab" data-bs-toggle="tab" data-bs-target="#nav-friend" type="button"
-                    role="tab" aria-controls="nav-friend" aria-selected="false">
-                    Friends
-                </button> -->
+        <div v-else-if="getUserBasicInformation.length == 0">
+            {{ stopDotsInterval() }}
+            <div class="d-flex flex-column align-items-center">
+                <i class="bi bi-database-fill-x" style="font-size: 3rem;"></i>
+                <span class="fs-6">NO DATA</span>
             </div>
-        </nav>
+        </div>
 
-        <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
-                <div class="d-flex flex-column align-items-center my-5">
-                    <div class="col-10 col-sm-8 col-md-6 mb-3">
-                        <label for="userName" class="form-label">User Name</label>
-                        <input type="text" class="form-control" id="userName" v-model="userName" @input="userEditEvent">
-                    </div>
-                    <div class="col-10 col-sm-8 col-md-6 mb-3">
-                        <label for="emailAddress" class="form-label">Email Address</label>
-                        <input type="email" class="form-control" id="emailAddress" v-model="userEmail" disabled>
-                    </div>
-                    <div class="col-10 col-sm-8 col-md-6 mb-3">
-                        <input type="button" class="btn btn-success form-control" value="Update Profile"
-                            :disabled="activeProfileUpdateBtn" @click="updateProfile">
-                    </div>
+        <div v-else class="profile-layout">
+            {{ stopDotsInterval() }}
+            <div class="d-flex flex-column align-items-center my-5">
+                <div class="text-center">
+                    <h1>Profile</h1>
+                </div>
+                <div class="col-10 col-sm-8 col-md-6 mb-3">
+                    <label for="userName" class="form-label">User Name</label>
+                    <input type="text" class="form-control" id="userName" v-model="userBasicInfo.userName"
+                        @input="userEditEvent">
+                </div>
+                <div class="col-10 col-sm-8 col-md-6 mb-3">
+                    <label for="emailAddress" class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="emailAddress" v-model="userBasicInfo.emailAddress"
+                        disabled>
+                </div>
+                <div class="col-10 col-sm-8 col-md-6 mb-3">
+                    <input type="button" class="btn btn-success form-control" value="Update Profile"
+                        :disabled="activeProfileUpdateBtn" @click="updateProfile">
                 </div>
             </div>
-
-            <div class="tab-pane fade" id="nav-gallery" role="tabpanel" aria-labelledby="nav-gallery-tab">
-                <div class="gallery">
-                    <div v-for="(item, index) in galleryData" class="position-relative gallery-item" :key="index">
-                        <div class="hover-view" v-if="item.urlPath != previewImg">
-                            <button class="btn btn-danger" @click="deleteImage(item)">
-                                Delete <i class="bi bi-trash-fill"></i>
-                            </button>
-                            <button class="btn btn-danger">
-                                Use as Profile <i class="bi bi-person-bounding-box"></i>
-                            </button>
-                        </div>
-                        <!-- {{ item }} -->
-                        <img :src="item.urlPath" :alt="item.name">
-                    </div>
-                </div>
-            </div>
-
-            <!-- <div class="tab-pane fade" id="nav-friend" role="tabpanel" aria-labelledby="nav-friend-tab">
-                ...
-            </div> -->
         </div>
     </div>
 </template>
 <script>
-import personIcon from "@/assets/img/no-preview.png"
+var dotsInterval;
+var isIncrease = true;
 export default {
     data() {
         return {
-            'personIcon': personIcon,
-            // profile image
-            'selectedFile': null,
-            'previewImg': null,
+            activeProfileUpdateBtn: true,
+            userBasicInfo: null,
+            userBasicInfoClone: null,
 
-            // allImages
-            galleryData: new Set(),
-
-            // other info
-            userNameOri: '',
-            userName: '',
-            userEmail: '',
-
-            activeProfileUpdateBtn: true
+            dots: [""],
         }
     },
     methods: {
-        userEditEvent() {
-            if (this.userName != this.userNameOri) {
-                this.activeProfileUpdateBtn = false
-            } else {
-                this.activeProfileUpdateBtn = true
-            }
+        stopDotsInterval() {
+            clearInterval(dotsInterval)
         },
-        selectFile(event) {
-            if (event.target.files && event.target.files[0]) {
-
-                // Image file read & write
-                const reader = new FileReader
-                reader.onload = e => {
-                    this.previewImg = e.target.result
+        userEditEvent() {
+            this.activeProfileUpdateBtn = true
+            Object.keys(this.userBasicInfo).forEach((key) => {
+                if (this.userBasicInfo[key] != this.userBasicInfoClone[key] && key != 'createdTimestamp') {
+                    this.activeProfileUpdateBtn = false
+                    return;
                 }
-                reader.readAsDataURL(event.target.files[0])
-
-                this.selectedFile = event.target.files[0]
-            }
+            })
         },
         updateProfile() {
             this.$store.dispatch('updateExistingDocument', {
-                data: { userName: this.userName },
-                collectionName: 'users_profile',
-                docId: this.getFirebaseUserInfo.uid
+                data: { userName: this.userBasicInfo.userName },
+                collectionName: 'users',
+                docId: this.userBasicInfo.docId
             })
-            this.userNameOri = this.userName
             this.activeProfileUpdateBtn = true
         },
-        uploadProfileImage() {
-            if (this.selectedFile) {
-                this.$store.dispatch('fileUpload', {
-                    file: this.selectedFile,
-                    fileType: 'image',
-                    saveFileFolderName: 'profile',
-                    docId: this.getFirebaseUserInfo.uid
-                })
-
-                this.selectedFile = null
-                // TODO: get the state of finish file upload
-                setTimeout(() => {
-                    this.loadAllImagesBtnClick()
-                }, 1000);
-            }
-        },
-        handleSelectFile() {
-            this.$refs.fileInput.click()
-        },
-        loadAllImagesBtnClick() {
-            this.$store.dispatch('getAllImages')
-        },
-        deleteImage(data) {
-            this.$store.dispatch('fileDelete', {
-                fileName: data.name,
-                fileType: 'image',
-                saveFileFolderName: 'profile'
-            })
-        }
     },
     computed: {
         getFirebaseUserInfo() {
             return this.$store.getters.acquireUserInfo
         },
-        loadUserProfile: {
-            get() {
-                return this.$store.getters.acquireUserProfileData('user-profile')
+        getUserBasicInformation() {
+            let tmp = this.$store.getters.acquireUserProfileData('basicInfo')
+            this.userBasicInfo = tmp == null ? null : tmp[0] ?? []
+
+            if (this.userBasicInfoClone == null) {
+                this.userBasicInfoClone = JSON.parse(JSON.stringify(this.userBasicInfo))
             }
-        },
-        loadAllImages() {
-            return this.$store.getters.acquireAllImages
-        }
-    },
-    watch: {
-        loadUserProfile: {
-            immediate: true,
-            deep: true,
-            handler(newVal, _) {
-                if (newVal) {
-                    this.userNameOri = newVal.userName ?? ''
-                    this.userName = newVal.userName ?? ''
-                    this.userEmail = newVal.email
-                    this.previewImg = newVal.profileImageUrl
-                }
-            }
-        },
-        loadAllImages(newVal, oldVal) {
-            setTimeout(() => {
-                if (Array.isArray(newVal)) {
-                    this.galleryData.clear()
-                    const sort2 = [...newVal].sort()
-                    for (let i = sort2.length - 1; i >= 0; i--) {
-                        this.galleryData.add(sort2[i])
-                    }
-                }
-            }, 1000);
+            return this.userBasicInfo
         }
     },
     mounted() {
-        // Load user profile data from firebase after 1s of page mounted
+        if (!this.data)
+            dotsInterval = setInterval(() => {
+                if (this.dots.length < 9 && isIncrease) {
+                    this.dots.push("")
+                    if (this.dots.length == 8)
+                        isIncrease = !isIncrease
+                } else {
+                    this.dots.pop()
+                    if (this.dots.length == 1)
+                        isIncrease = !isIncrease
+                }
+            }, 300)
+
         setTimeout(() => {
             this.$store.dispatch('getCollectionData', {
-                collectionName: 'users_profile',
-                wheres: [],
+                collectionName: 'users',
+                wheres: [
+                    { key: 'uid', opt: '==', value: this.getFirebaseUserInfo?.uid }
+                ],
                 orders: [],
                 groupName: 'userProfileData',
-                saveCollectionName: 'user-profile',
-                docId: this.getFirebaseUserInfo.uid,
-                init: true
+                saveCollectionName: 'basicInfo',
             })
-
-            this.$store.dispatch('getAllImages')
         }, 1500);
     },
 }

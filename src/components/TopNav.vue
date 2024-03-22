@@ -21,12 +21,12 @@
 
 
 
-                    <!-- <li v-if="getUserID != null">
+                    <li v-if="getUserID != null">
                         <router-link :to="{ name: 'user-profile' }" class="nav-link">プロフィール</router-link>
-                    </li> -->
+                    </li>
 
-                    <router-link v-if="getUserID && getUserRole && getUserRole == 99" :to="{ name: 'all-years-schedule' }"
-                        class="nav-link">年間スケジュール</router-link>
+                    <router-link v-if="getUserID && getUserRole && getUserRole == 99"
+                        :to="{ name: 'all-years-schedule' }" class="nav-link">年間スケジュール</router-link>
 
                     <button v-if="getUserID != null" class="btn btn-logout" data-bs-toggle="modal"
                         data-bs-target="#logoutModal">ログアウト</button>
